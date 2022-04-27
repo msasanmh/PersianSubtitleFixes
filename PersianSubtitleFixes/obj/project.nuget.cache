@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "Q/oTryrH5UklHFchiWA2bM2Wp59usynafF6P+OaZrJXbpWAY135H/xlbP5xGO/QgGLQ4Kwhnlyam89Tcxalk+Q==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\MSMH\\Documents\\Visual Studio 2022\\Projects\\PersianSubtitleFixes\\PersianSubtitleFixes\\PersianSubtitleFixes.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\MSMH\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
+    "C:\\Users\\MSMH\\.nuget\\packages\\system.text.encoding.codepages\\6.0.0\\system.text.encoding.codepages.6.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}

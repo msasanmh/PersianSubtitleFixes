@@ -1,0 +1,13 @@
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\PersianSubtitleFixesPortable\bin\Debug\net6.0-windows\PersianSubtitleFixesPortable.exe
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\PersianSubtitleFixesPortable\bin\Debug\net6.0-windows\PersianSubtitleFixesPortable.deps.json
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\PersianSubtitleFixesPortable\bin\Debug\net6.0-windows\PersianSubtitleFixesPortable.runtimeconfig.json
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\PersianSubtitleFixesPortable\bin\Debug\net6.0-windows\PersianSubtitleFixesPortable.dll
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\PersianSubtitleFixesPortable\obj\Debug\net6.0-windows\PersianSubtitleFixesPortable.csproj.AssemblyReference.cache
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\PersianSubtitleFixesPortable\obj\Debug\net6.0-windows\PersianSubtitleFixesPortable.Properties.Resources.resources
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\PersianSubtitleFixesPortable\obj\Debug\net6.0-windows\PersianSubtitleFixesPortable.csproj.GenerateResource.cache
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\PersianSubtitleFixesPortable\obj\Debug\net6.0-windows\PersianSubtitleFixesPortable.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\PersianSubtitleFixesPortable\obj\Debug\net6.0-windows\PersianSubtitleFixesPortable.AssemblyInfoInputs.cache
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\PersianSubtitleFixesPortable\obj\Debug\net6.0-windows\PersianSubtitleFixesPortable.AssemblyInfo.cs
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\PersianSubtitleFixesPortable\obj\Debug\net6.0-windows\PersianSubtitleFixesPortable.csproj.CoreCompileInputs.cache
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\PersianSubtitleFixesPortable\obj\Debug\net6.0-windows\PersianSubtitleFixesPortable.dll
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\PersianSubtitleFixesPortable\obj\Debug\net6.0-windows\PersianSubtitleFixesPortable.genruntimeconfig.cache

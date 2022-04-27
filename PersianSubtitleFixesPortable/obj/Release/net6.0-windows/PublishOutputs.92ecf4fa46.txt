@@ -1,0 +1,4 @@
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\test\PersianSubtitleFixesPortable.exe
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\test\PersianSubtitleFixesPortable.dll
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\test\PersianSubtitleFixesPortable.deps.json
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\test\PersianSubtitleFixesPortable.runtimeconfig.json

@@ -1,0 +1,138 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <SignAssembly>False</SignAssembly>
+    <Copyright>MSasanMH</Copyright>
+    <AssemblyVersion>1.1</AssemblyVersion>
+    <FileVersion>1.0.2</FileVersion>
+    <Product>Persian Subtitle Fixes</Product>
+    <NeutralLanguage>en</NeutralLanguage>
+    <DebugType>embedded</DebugType>
+    <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
+    <IsPublishable>True</IsPublishable>
+    <ApplicationIcon>Icons\PersianSubtitleFixesIcon.ico</ApplicationIcon>
+    <Version>$(VersionPrefix)1.0.2</Version>
+    <PackageLicenseFile>C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\LICENSE.txt</PackageLicenseFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Icons\About.png" />
+    <None Remove="Icons\About_White.png" />
+    <None Remove="Icons\Exit.png" />
+    <None Remove="Icons\Exit_White.png" />
+    <None Remove="Icons\Open.png" />
+    <None Remove="Icons\Redo.png" />
+    <None Remove="Icons\Redo_White.png" />
+    <None Remove="Icons\Refresh.png" />
+    <None Remove="Icons\Refresh_White.png" />
+    <None Remove="Icons\Save.png" />
+    <None Remove="Icons\Save_all.png" />
+    <None Remove="Icons\Save_all_White.png" />
+    <None Remove="Icons\Save_as.png" />
+    <None Remove="Icons\Save_as_White.png" />
+    <None Remove="Icons\Save_White.png" />
+    <None Remove="Icons\Settings.png" />
+    <None Remove="Icons\Settings_White.png" />
+    <None Remove="Icons\Terminal.png" />
+    <None Remove="Icons\Terminal_White.png" />
+    <None Remove="Icons\Undo.png" />
+    <None Remove="Icons\Undo_White.png" />
+    <None Remove="Library\Crc32.NET.dll" />
+    <None Remove="Library\EasyRender.dll" />
+    <None Remove="Library\FileHelpers.dll" />
+    <None Remove="Library\libse.dll" />
+    <None Remove="Library\Newtonsoft.Json.dll" />
+    <None Remove="Library\ObjectListView.dll" />
+    <None Remove="Library\UtfUnknown.dll" />
+    <None Remove="multiple_replace.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Icons\PersianSubtitleFixesIcon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Library\Crc32.NET.dll">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Library\libse.dll" />
+    <EmbeddedResource Include="Library\UtfUnknown.dll" />
+    <EmbeddedResource Include="multiple_replace.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0">
+      <TreatAsUsed>true</TreatAsUsed>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Crc32.NET">
+      <HintPath>Library\Crc32.NET.dll</HintPath>
+      <CopyLocal>False</CopyLocal>
+    </Reference>
+    <Reference Include="libse">
+      <HintPath>Library\libse.dll</HintPath>
+      <CopyLocal>False</CopyLocal>
+    </Reference>
+    <Reference Include="UtfUnknown">
+      <HintPath>Library\UtfUnknown.dll</HintPath>
+      <CopyLocal>False</CopyLocal>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="CustomControls\SBResources\SBResource.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>SBResource.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="CustomControls\SBResources\SBResource.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>SBResource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Resources\" />
+  </ItemGroup>
+
+</Project>

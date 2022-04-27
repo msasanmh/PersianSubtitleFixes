@@ -1,0 +1,7 @@
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PublishPSF\PersianSubtitleFixes\PersianSubtitleFixes.exe
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PublishPSF\PersianSubtitleFixes\PersianSubtitleFixes.dll
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PublishPSF\PersianSubtitleFixes\PersianSubtitleFixes.deps.json
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PublishPSF\PersianSubtitleFixes\PersianSubtitleFixes.runtimeconfig.json
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PublishPSF\PersianSubtitleFixes\Crc32.NET.dll
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PublishPSF\PersianSubtitleFixes\libse.dll
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PublishPSF\PersianSubtitleFixes\UtfUnknown.dll

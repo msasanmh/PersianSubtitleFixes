@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>PersianSubtitleFixesPortable</id>
+    <version>1.0.0</version>
+    <authors>PersianSubtitleFixesPortable</authors>
+    <description>Package Description</description>
+    <copyright>MSasanMH</copyright>
+    <dependencies>
+      <group targetFramework="net6.0-windows7.0" />
+    </dependencies>
+    <contentFiles>
+      <files include="any/net6.0-windows7.0/PersianSubtitleFixesIcon.ico" buildAction="Content" />
+    </contentFiles>
+  </metadata>
+  <files>
+    <file src="C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\PersianSubtitleFixesPortable\bin\Debug\net6.0-windows\PersianSubtitleFixesPortable.runtimeconfig.json" target="lib\net6.0-windows7.0\PersianSubtitleFixesPortable.runtimeconfig.json" />
+    <file src="C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\PersianSubtitleFixesPortable\bin\Debug\net6.0-windows\PersianSubtitleFixesPortable.dll" target="lib\net6.0-windows7.0\PersianSubtitleFixesPortable.dll" />
+    <file src="C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\PersianSubtitleFixesPortable\PersianSubtitleFixesIcon.ico" target="content\PersianSubtitleFixesIcon.ico" />
+    <file src="C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\PersianSubtitleFixesPortable\PersianSubtitleFixesIcon.ico" target="contentFiles\any\net6.0-windows7.0\PersianSubtitleFixesIcon.ico" />
+  </files>
+</package>

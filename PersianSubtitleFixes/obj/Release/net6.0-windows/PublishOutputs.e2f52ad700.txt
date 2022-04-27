@@ -1,0 +1,7 @@
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\test2\PersianSubtitleFixes.exe
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\test2\PersianSubtitleFixes.dll
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\test2\PersianSubtitleFixes.deps.json
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\test2\PersianSubtitleFixes.runtimeconfig.json
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\test2\Crc32.NET.dll
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\test2\libse.dll
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\test2\UtfUnknown.dll

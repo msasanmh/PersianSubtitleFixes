@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "dgSpecHash": "HTlRk77TSS3xeDfNLFSlDuN/UnoMcSBnhpPnAKcWxyHc+AsH14dGCaWPPhWJ+E5oLw6ujNxxIVZG95g8bjjkyw==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\MSMH\\Documents\\Visual Studio 2022\\Projects\\PersianSubtitleFixes\\PersianSubtitleFixes\\PersianSubtitleFixes.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\MSMH\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
+    "C:\\Users\\MSMH\\.nuget\\packages\\system.text.encoding.codepages\\6.0.0\\system.text.encoding.codepages.6.0.0.nupkg.sha512",
+    "C:\\Users\\MSMH\\.nuget\\packages\\microsoft.netcore.app.runtime.win-x86\\6.0.1\\microsoft.netcore.app.runtime.win-x86.6.0.1.nupkg.sha512",
+    "C:\\Users\\MSMH\\.nuget\\packages\\microsoft.windowsdesktop.app.runtime.win-x86\\6.0.1\\microsoft.windowsdesktop.app.runtime.win-x86.6.0.1.nupkg.sha512",
+    "C:\\Users\\MSMH\\.nuget\\packages\\microsoft.aspnetcore.app.runtime.win-x86\\6.0.1\\microsoft.aspnetcore.app.runtime.win-x86.6.0.1.nupkg.sha512",
+    "C:\\Users\\MSMH\\.nuget\\packages\\microsoft.netcore.app.crossgen2.win-x64\\6.0.1\\microsoft.netcore.app.crossgen2.win-x64.6.0.1.nupkg.sha512"
+  ],
+  "logs": []
+}
