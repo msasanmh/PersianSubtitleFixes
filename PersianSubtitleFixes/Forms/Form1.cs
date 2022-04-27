@@ -871,7 +871,11 @@ namespace PersianSubtitleFixes
                                                 if (child1.ChildNodes[0].InnerText == "True")
                                                 {
                                                     string findWhat = @child1.ChildNodes[1].InnerText;
+                                                    findWhat = findWhat.Replace("\"", "\\\"");
+                                                    findWhat = findWhat.Replace("\\\\\"", "\\\"");
                                                     string replaceWith = @child1.ChildNodes[2].InnerText;
+                                                    if (replaceWith == "")
+                                                        replaceWith = " ";
                                                     string searchType = @child1.ChildNodes[3].InnerText;
                                                     if (!string.IsNullOrEmpty(findWhat)) // allow space or spaces
                                                     {

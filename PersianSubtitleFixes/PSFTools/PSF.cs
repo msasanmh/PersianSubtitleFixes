@@ -18,7 +18,7 @@ namespace PersianSubtitleFixes.msmh
 {
     public static class PSF
     {
-        public static readonly string ResourcePath = "PersianSubtitleFixes.multiple_replace.xml";
+        public static readonly string ResourcePath = "PersianSubtitleFixes.ReplaceList.multiple_replace.xml";
         public static readonly string Group_ChangeArabicCharsToPersian = "Change Arabic Char to Persian";
         private static readonly string exception1 = "Options";
         private static readonly string exception2 = "Formal to Slang";
