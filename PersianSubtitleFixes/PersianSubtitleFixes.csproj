@@ -54,7 +54,7 @@
     <None Remove="Library\Newtonsoft.Json.dll" />
     <None Remove="Library\ObjectListView.dll" />
     <None Remove="Library\UtfUnknown.dll" />
-    <None Remove="multiple_replace.xml" />
+    <None Remove="ReplaceList\multiple_replace.xml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -67,7 +67,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Library\libse.dll" />
     <EmbeddedResource Include="Library\UtfUnknown.dll" />
-    <EmbeddedResource Include="multiple_replace.xml" />
+    <EmbeddedResource Include="ReplaceList\multiple_replace.xml" />
   </ItemGroup>
 
   <ItemGroup>
