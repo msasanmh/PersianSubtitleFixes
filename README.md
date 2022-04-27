@@ -17,3 +17,4 @@ Its a free software to enhance Persian subtitles.
 - and more.
 
 **Screenshots**
+![Sample1](https://user-images.githubusercontent.com/1586825/165562028-1dbf1e44-8fb1-4404-a110-54ec6582b99d.jpg)
