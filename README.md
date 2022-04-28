@@ -21,4 +21,4 @@ Its a free software to enhance Persian subtitles.
 
 ------------
 
-[**Download**](https://github.com/msasanmh/PersianSubtitleFixes/releases/")
+[**Download**](https://github.com/msasanmh/PersianSubtitleFixes/releases/)
