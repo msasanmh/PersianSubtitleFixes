@@ -3,21 +3,20 @@
 Its a free software to enhance Persian subtitles.
 
 **Features**
-- Dialog Hyphen Fix
-- Comma Fixes
-- Dot Fixes
-- Exclamation Mark Fixes
-- Question Mark Fixes
+- Change Arabic Chars to Persian
 - Remove Unneeded Spaces
-- Parentheses Fixes
-- Double-Quotes Fixes
-- Dash Fixes
-- Change Arabic Char to Persian
+- Add Missing Spaces
+- Fix Dialog Hyphen
+- Fix Wrong Chars
+- Fix Misplaced Chars
+- Fix Abbreviations
 - Space to Invisible Space
+- Remove Leading Dots
+- Remove Dot from the End of Line
 - and more.
 
 **Screenshots**
-![Sample1](https://user-images.githubusercontent.com/1586825/165562028-1dbf1e44-8fb1-4404-a110-54ec6582b99d.jpg)
+![Sample](https://user-images.githubusercontent.com/1586825/192585543-4635dc9c-1581-499c-9f93-434d2e7f06c2.jpg)
 
 ------------
 
