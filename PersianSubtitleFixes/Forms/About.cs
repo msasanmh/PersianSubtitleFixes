@@ -1,5 +1,5 @@
 ﻿using MsmhTools;
-using PersianSubtitleFixes.msmh;
+using PSFTools;
 using System.Windows.Forms;
 
 namespace PersianSubtitleFixes
@@ -11,8 +11,8 @@ namespace PersianSubtitleFixes
         public About()
         {
             InitializeComponent();
-            CurrentTheme = PSF.GetTheme();
-            PSF.LoadTheme(this, Controls);
+            CurrentTheme = Theme.GetTheme();
+            Theme.LoadTheme(this, Controls);
 
             string productName = Tools.Info.InfoExecutingAssembly.ProductName;
             var productVersion = Tools.Info.InfoExecutingAssembly.ProductVersion;
@@ -20,13 +20,13 @@ namespace PersianSubtitleFixes
             Text = "About " + productName;
 
             // Product Name
-            LabelProduct.Text = productName + " v" + productVersion.ToString();
+            CustomLabelProduct.Text = productName + " v" + productVersion.ToString();
 
             // Product Details
-            LabelDetails.Text = productName + " is a free software to enhance Persian subtitles.\r\nIt's under the GNU GPLv3 License.";
+            CustomLabelDetails.Text = productName + " is a free software to enhance Persian subtitles.\r\nIt's under the GNU GPLv3 License.";
 
             // Product Homepage
-            LabelHomePage.Text = "Homepage:";
+            CustomLabelHomePage.Text = "Homepage:";
             LinkLabelHomePage.Text = "Github Page";
             LinkLabelHomePage.LinkClicked += (object sender, LinkLabelLinkClickedEventArgs e) =>
             {
@@ -34,7 +34,7 @@ namespace PersianSubtitleFixes
             };
 
             // Subtitle Library
-            LabelLib.Text = "Subtitle Library:";
+            CustomLabelLib.Text = "Subtitle Library:";
             LinkLabelLib.Text = "LibSE by Nikse";
             LinkLabelLib.LinkClicked += (object sender, LinkLabelLinkClickedEventArgs e) =>
             {
@@ -42,7 +42,7 @@ namespace PersianSubtitleFixes
             };
 
             // Iconset
-            LabelIconSet.Text = "Iconset:";
+            CustomLabelIconSet.Text = "Iconset:";
             LinkLabelIconSet.Text = "Icons8.com";
             LinkLabelIconSet.LinkClicked += (object sender, LinkLabelLinkClickedEventArgs e) =>
             {
@@ -50,7 +50,7 @@ namespace PersianSubtitleFixes
             };
 
             // Email
-            LabelEmail.Text = "Email:";
+            CustomLabelEmail.Text = "Email:";
             LinkLabelEmail.Text = "msasanmh@gmail.com";
             LinkLabelEmail.LinkClicked += (object sender, LinkLabelLinkClickedEventArgs e) =>
             {

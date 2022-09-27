@@ -1,29 +1,32 @@
 ﻿using MsmhTools;
 using Nikse.SubtitleEdit.Core.Common;
 using Nikse.SubtitleEdit.Core.SubtitleFormats;
+using PersianSubtitleFixes;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PersianSubtitleFixes.msmh
+namespace PSFTools
 {
     public static class PSFUndoRedo
     {
-        public static bool Undo { get; set; }
-        public static bool Redo { get; set; }
-        public static List<Tuple<Subtitle, string, SubtitleFormat>> UndoRedoList { get; set; } = new List<Tuple<Subtitle, string, SubtitleFormat>>();
-        public static int CurrentIndex = 0;
-        public static void UndoRedo(Subtitle subCurrent, string subEncodingDisplayName, SubtitleFormat subtitleFormat)
+        public static bool Undo { get; private set; }
+        public static bool Redo { get; private set; }
+        public static List<Tuple<Subtitle, string, SubtitleFormat, string>> UndoRedoList { get; set; } = new List<Tuple<Subtitle, string, SubtitleFormat, string>>();
+        public static int CurrentIndex { get; set; } = 0;
+
+        public static void UndoRedo(Subtitle subCurrent, string? subEncodingDisplayName, SubtitleFormat? subtitleFormat, string message)
         {
             if (string.IsNullOrWhiteSpace(subEncodingDisplayName) || subtitleFormat == null)
                 return;
-            //for (int ci = CurrentIndex; ci < UndoRedoList.Count; ci++)
+
             int MaxIndex = UndoRedoList.Count - 1;
             if (MaxIndex > CurrentIndex)
                 UndoRedoList.RemoveRange(CurrentIndex + 1, MaxIndex - CurrentIndex);
-            UndoRedoList.Add(new Tuple<Subtitle, string, SubtitleFormat>(subCurrent, subEncodingDisplayName, subtitleFormat));
+            UndoRedoList.Add(new Tuple<Subtitle, string, SubtitleFormat, string>(subCurrent, subEncodingDisplayName, subtitleFormat, message));
             int LC = UndoRedoList.Count;
             CurrentIndex = LC - 1;
             UpdateIndex(CurrentIndex);
@@ -43,12 +46,16 @@ namespace PersianSubtitleFixes.msmh
                     UpdateIndex(CurrentIndex);
                 }
             }
+
+            Debug.WriteLine("Current UndoRedo Index: " + CurrentIndex);
         }
-        public static Tuple<Subtitle, string, SubtitleFormat> UndoRedo(int currentIndex)
+
+        public static Tuple<Subtitle, string, SubtitleFormat, string> UndoRedo(int currentIndex)
         {
             UpdateIndex(currentIndex);
             return UndoRedoList[currentIndex];
         }
+
         private static void UpdateIndex(int currentIndex)
         {
             int LC = UndoRedoList.Count;

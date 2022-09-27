@@ -1,8 +1,8 @@
 ﻿using CustomControls;
 using MsmhTools;
+using PSFTools;
 using Nikse.SubtitleEdit.Core.Common;
 using PersianSubtitleFixes;
-using PersianSubtitleFixes.msmh;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -181,15 +181,15 @@ namespace MsmhTools
             DataSet ds;
             ds = FormMain.DataSetSettings;
 
-            if (!ds.Tables.Contains("General"))
+            if (!ds.Tables.Contains(PSFSettings.SettingsName.General))
                 return DefaultEncodingDisplayName;
-            if (ds.Tables["General"].Columns.Contains("DefaultEncodingDisplayName"))
+            if (ds.Tables[PSFSettings.SettingsName.General].Columns.Contains("DefaultEncodingDisplayName"))
             {
-                if (ds.Tables["General"].Rows[0] == null)
+                if (ds.Tables[PSFSettings.SettingsName.General].Rows[0] == null)
                     return DefaultEncodingDisplayName;
                 else
                 {
-                    string displayName = (string)ds.Tables["General"].Rows[0]["DefaultEncodingDisplayName"];
+                    string displayName = (string)ds.Tables[PSFSettings.SettingsName.General].Rows[0]["DefaultEncodingDisplayName"];
                     if (IsDisplayNameAvailable(displayName))
                         return displayName;
                     else
@@ -287,7 +287,7 @@ namespace MsmhTools
             }
             if (encodingDisplayName == null)
                 return null;
-            if (IsDisplayNameAvailable(encodingDisplayName) == false)
+            if (!IsDisplayNameAvailable(encodingDisplayName))
                 return null;
             return encodingDisplayName;
         }
@@ -550,17 +550,20 @@ namespace MsmhTools
         {
             if (IsDisplayNameAvailable(subEncodingDisplayName) == false)
                 return;
-            foreach (var _DisplayNameComboBox in comboBox.Items)
+            comboBox.InvokeIt(() =>
             {
-                if (subEncodingDisplayName == _DisplayNameComboBox.ToString())
+                foreach (var _DisplayNameComboBox in comboBox.Items)
                 {
-                    comboBox.SelectedItem = subEncodingDisplayName;
-                    return;
+                    if (subEncodingDisplayName == _DisplayNameComboBox.ToString())
+                    {
+                        comboBox.SelectedItem = subEncodingDisplayName;
+                        return;
+                    }
                 }
-            }
-            comboBox.Items.Add(subEncodingDisplayName);
-            comboBox.SelectedItem = subEncodingDisplayName;
-            return;
+                comboBox.Items.Add(subEncodingDisplayName);
+                comboBox.SelectedItem = subEncodingDisplayName;
+                return;
+            });
         }
         public static async Task ConvertEncoding(string srcPath, Encoding srcEncoding, string dstPath, ToolStripComboBox comboBox)
         {

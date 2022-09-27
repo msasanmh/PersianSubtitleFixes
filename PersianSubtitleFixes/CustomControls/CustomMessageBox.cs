@@ -1,12 +1,8 @@
 ﻿using MsmhTools;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 /*
  * Copyright MSasanMH, April 14, 2022.
+ * Needs CustomButton.
  */
 
 namespace CustomControls
@@ -233,11 +229,11 @@ namespace CustomControls
 
             // Button
             Panel buttonPanel = new();
-            buttonPanel.BackColor = BackColor.ChangeBrightness(-0.1f);
+            buttonPanel.BackColor = BackColor.ChangeBrightness(-0.2f);
             buttonPanel.ForeColor = ForeColor;
             buttonPanel.BorderStyle = BorderStyle.None;
             buttonPanel.Margin = new Padding(0);
-            buttonPanel.Location = new(rect.X, textPanel.Bottom);
+            buttonPanel.Location = new(rect.X, Height - buttonPanelHeight - 1); // 1 is bottom border
             buttonPanel.Size = new(rect.Width, buttonPanelHeight);
             buttonPanel.Anchor = AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Right;
             Controls.Add(buttonPanel);
@@ -277,6 +273,9 @@ namespace CustomControls
                     dialogResult = DialogResult.Ignore;
                 };
                 buttonPanel.Controls.Add(btn3);
+
+                AcceptButton = btn2;
+                CancelButton = btn1;
             }
             else if (buttons == MessageBoxButtons.CancelTryContinue)
             {
@@ -310,6 +309,9 @@ namespace CustomControls
                     dialogResult = DialogResult.Continue;
                 };
                 buttonPanel.Controls.Add(btn3);
+
+                AcceptButton = btn2;
+                CancelButton = btn1;
             }
             else if (buttons == MessageBoxButtons.OK)
             {
@@ -323,6 +325,8 @@ namespace CustomControls
                     dialogResult = DialogResult.OK;
                 };
                 buttonPanel.Controls.Add(btn1);
+
+                AcceptButton = btn1;
             }
             else if (buttons == MessageBoxButtons.OKCancel)
             {
@@ -346,6 +350,9 @@ namespace CustomControls
                     dialogResult = DialogResult.Cancel;
                 };
                 buttonPanel.Controls.Add(btn2);
+
+                AcceptButton = btn1;
+                CancelButton = btn2;
             }
             else if (buttons == MessageBoxButtons.RetryCancel)
             {
@@ -369,6 +376,9 @@ namespace CustomControls
                     dialogResult = DialogResult.Cancel;
                 };
                 buttonPanel.Controls.Add(btn2);
+
+                AcceptButton = btn1;
+                CancelButton = btn2;
             }
             else if (buttons == MessageBoxButtons.YesNo)
             {
@@ -392,6 +402,9 @@ namespace CustomControls
                     dialogResult = DialogResult.No;
                 };
                 buttonPanel.Controls.Add(btn2);
+
+                AcceptButton = btn1;
+                CancelButton = btn2;
             }
             else if (buttons == MessageBoxButtons.YesNoCancel)
             {
@@ -425,6 +438,9 @@ namespace CustomControls
                     dialogResult = DialogResult.Cancel;
                 };
                 buttonPanel.Controls.Add(btn3);
+
+                AcceptButton = btn1;
+                CancelButton = btn3;
             }
 
             // Set CustomButton Colors
@@ -432,10 +448,10 @@ namespace CustomControls
             foreach (Control c in cs)
                 if (c is CustomButton customButton)
                 {
-                    customButton.BackColor = Colors.BackColor;
-                    customButton.ForeColor = Colors.ForeColor;
-                    customButton.BorderColor = Colors.Border;
-                    customButton.SelectionColor = Colors.SelectionRectangle;
+                    customButton.BackColor = BackColor;
+                    customButton.ForeColor = ForeColor;
+                    customButton.BorderColor = BorderColor;
+                    customButton.SelectionColor = BorderColor;
                     customButton.Invalidate();
                 }
         }

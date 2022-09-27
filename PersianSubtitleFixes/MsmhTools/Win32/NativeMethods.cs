@@ -54,6 +54,9 @@ namespace MsmhTools
         [DllImport("user32.dll")]
         public static extern int GetWindowLong(IntPtr hWnd, int Index);
 
+        [DllImport("user32.dll")]
+        public static extern int SetWindowLong(IntPtr hWnd, int nIndex, uint dwNewLong);
+
 
         [StructLayout(LayoutKind.Sequential)]
         public struct COMBOBOXINFO
@@ -105,7 +108,7 @@ namespace MsmhTools
         internal static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
 
         [DllImport("uxtheme.dll", CharSet = CharSet.Unicode)]
-        internal extern static int SetWindowTheme(IntPtr hWnd, string pszSubAppName, string pszSubIdList);
+        internal extern static int SetWindowTheme(IntPtr hWnd, string pszSubAppName, string? pszSubIdList);
         // Usage: SetWindowTheme(control.Handle, "DarkMode_Explorer", null);
 
         #endregion Win32 API

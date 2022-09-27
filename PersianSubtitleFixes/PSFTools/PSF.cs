@@ -13,13 +13,18 @@ using System.Text.RegularExpressions;
 using System.Data;
 using CustomControls;
 using System.Resources;
+using System.Diagnostics;
+using System.Xml.Linq;
 
-namespace PersianSubtitleFixes.msmh
+namespace PSFTools
 {
     public static class PSF
     {
         public static readonly string ResourcePath = "PersianSubtitleFixes.ReplaceList.multiple_replace.xml";
-        public static readonly string Group_ChangeArabicCharsToPersian = "Change Arabic Char to Persian";
+        public static readonly string ReplaceListPath = Path.Combine(Tools.Info.CurrentPath, "ReplaceList", "multiple_replace.xml");
+        public static readonly string LineSeparator = "<br />";
+        public static readonly string Group_FixUnicodeControlChar = "Fix Unicode Control Char";
+        public static readonly string Group_ChangeArabicCharsToPersian = "Change Arabic Chars to Persian";
         private static readonly string exception1 = "Options";
         private static readonly string exception2 = "Formal to Slang";
         private static readonly string exception3 = "Guide";
@@ -27,169 +32,7 @@ namespace PersianSubtitleFixes.msmh
         public static readonly string suffixN = "_Normal";
         public static readonly string suffixR = "_RegularExpression";
         public static readonly Lazy<string> SubtitleExtensionFilter = new(FileDlgFilter);
-        public static readonly string DefaultTheme = "Light";
-        //=======================================================================================
-        public static string GetTheme()
-        {
-            DataSet ds;
-            ds = FormMain.DataSetSettings;
-
-            if (!ds.Tables.Contains("General"))
-                return DefaultTheme;
-            if (ds.Tables["General"].Columns.Contains("Theme"))
-            {
-                if (ds.Tables["General"].Rows[0] == null)
-                    return DefaultTheme;
-                else
-                    return (string)ds.Tables["General"].Rows[0]["Theme"];
-            }
-            else
-                return DefaultTheme;
-        }
-        //=======================================================================================
-        public static void LoadTheme(Form form, Control.ControlCollection controlCollection)
-        {
-            DataSet ds;
-            ds = FormMain.DataSetSettings;
-            ResourceManager rm = new("PersianSubtitleFixes.Properties.Resources", typeof(Properties.Resources).Assembly);
-
-            if (ds.Tables["General"] == null)
-            {
-                // Load Default Theme (Light)
-                Colors.InitializeLight();
-                foreach (Control c in Tools.Controllers.GetAllControls(form))
-                {
-                    DarkTheme.SetDarkTheme(c);
-                    SetColors(c);
-                }
-                // Find ToolStrip Controls
-                foreach (var ctscb in Tools.Controllers.GetSubControls<CustomToolStripComboBox>(form))
-                {
-                    ctscb.BackColor = Colors.BackColor;
-                    ctscb.ForeColor = Colors.ForeColor;
-                    ctscb.BorderColor = Colors.Border;
-                    ctscb.SelectionColor = Colors.Selection;
-                }
-                return;
-            }
-
-            string s = string.Empty;
-            if (ds.Tables["General"].Columns.Contains("Theme"))
-                s = (string)ds.Tables["General"].Rows[0]["Theme"];
-            if (s == "Dark")
-            {
-                // Load Dark Theme
-                Colors.InitializeDark();
-                DarkTheme.SetDarkTheme(form); // Makes TitleBar Black
-                foreach (Control c in Tools.Controllers.GetAllControls(form))
-                {
-                    DarkTheme.SetDarkTheme(c);
-                    SetColors(c);
-                }
-                // Find ToolStrip Controls
-                foreach (var ctscb in Tools.Controllers.GetSubControls<CustomToolStripComboBox>(form))
-                {
-                    ctscb.BackColor = Colors.BackColor;
-                    ctscb.ForeColor = Colors.ForeColor;
-                    ctscb.BorderColor = Colors.Border;
-                    ctscb.SelectionColor = Colors.Selection;
-                }
-                foreach (var b in Tools.Controllers.GetSubControls<ToolStripButton>(form))
-                {
-
-                    if (b.Name.Contains("Open"))
-                        b.Image = PersianSubtitleFixes.Properties.Resources.Open_Blue;
-                    else if (b.Name.Contains("Save"))
-                        b.Image = PersianSubtitleFixes.Properties.Resources.Save_Blue;
-                    else if (b.Name.Contains("SaveAs"))
-                        b.Image = PersianSubtitleFixes.Properties.Resources.Save_as_Blue;
-                    else if (b.Name.Contains("Undo"))
-                        b.Image = PersianSubtitleFixes.Properties.Resources.Undo_Blue;
-                    else if (b.Name.Contains("Redo"))
-                        b.Image = PersianSubtitleFixes.Properties.Resources.Redo_Blue;
-                    else if (b.Name.Contains("Settings"))
-                        b.Image = PersianSubtitleFixes.Properties.Resources.Settings_Blue;
-                    else if (b.Name.Contains("About"))
-                        b.Image = PersianSubtitleFixes.Properties.Resources.About_Blue;
-                    else if (b.Name.Contains("Exit"))
-                        b.Image = PersianSubtitleFixes.Properties.Resources.Exit_Blue;
-                }
-            }
-            else if (s == "Light")
-            {
-                // Load Light Theme
-                Colors.InitializeLight();
-                foreach (Control c in Tools.Controllers.GetAllControls(form))
-                {
-                    DarkTheme.SetDarkTheme(c);
-                    SetColors(c);
-                }
-                // Find ToolStrip Controls
-                foreach (var ctscb in Tools.Controllers.GetSubControls<CustomToolStripComboBox>(form))
-                {
-                    ctscb.BackColor = Colors.BackColor;
-                    ctscb.ForeColor = Colors.ForeColor;
-                    ctscb.BorderColor = Colors.Border;
-                    ctscb.SelectionColor = Colors.Selection;
-                }
-            }
-            else
-            {
-                // Load Default Theme (Light)
-                Colors.InitializeLight();
-                foreach (Control c in Tools.Controllers.GetAllControls(form))
-                {
-                    DarkTheme.SetDarkTheme(c);
-                    SetColors(c);
-                }
-                // Find ToolStrip Controls
-                foreach (var ctscb in Tools.Controllers.GetSubControls<CustomToolStripComboBox>(form))
-                {
-                    ctscb.BackColor = Colors.BackColor;
-                    ctscb.ForeColor = Colors.ForeColor;
-                    ctscb.BorderColor = Colors.Border;
-                    ctscb.SelectionColor = Colors.Selection;
-                }
-            }
-        }
-        //=======================================================================================
-        public static void SetColors(Control c)
-        {
-            c.BackColor = Colors.BackColor;
-            c.ForeColor = Colors.ForeColor;
-            if (c is CustomButton customButton)
-            {
-                customButton.BorderColor = Colors.Border;
-                customButton.SelectionColor = Colors.SelectionRectangle;
-            }
-            else if (c is CustomCheckBox customCheckBox)
-            {
-                customCheckBox.BorderColor = Colors.Border;
-                customCheckBox.CheckColor = Colors.Tick;
-                customCheckBox.SelectionColor = Colors.SelectionRectangle;
-            }
-            else if (c is CustomComboBox customComboBox)
-            {
-                customComboBox.BorderColor = Colors.Border;
-                customComboBox.SelectionColor = Colors.Selection;
-            }
-            else if (c is CustomDataGridView customDataGridView)
-            {
-                customDataGridView.BorderColor = Colors.Border;
-                customDataGridView.SelectionColor = Colors.Selection;
-                customDataGridView.GridColor = Colors.GridLines;
-                customDataGridView.CheckColor = Colors.Tick;
-            }
-            else if (c is CustomPanel customPanel)
-            {
-                customPanel.BorderColor = Colors.Border;
-            }
-            else if (c is CustomProgressBar customProgressBar)
-            {
-                customProgressBar.BorderColor = Colors.Border;
-                customProgressBar.ChunksColor = Colors.Chunks;
-            }
-        }
+        
         //=======================================================================================
         public static bool IsSettingsValid(string filePath)
         {
@@ -378,40 +221,44 @@ namespace PersianSubtitleFixes.msmh
         }
         public static void UpdateComboBoxFormat(SubtitleFormat format, ComboBox comboBox)
         {
-            var friendlyNames = SubFormat.GetFriendlyName();
-            for (int n = 0; n < friendlyNames.Count; n++)
+            comboBox.InvokeIt(() =>
             {
-                if (friendlyNames[n] == format.FriendlyName)
+                var friendlyNames = SubFormat.GetFriendlyName();
+                for (int n = 0; n < friendlyNames.Count; n++)
                 {
-                    comboBox.SelectedItem = friendlyNames[n];
-                    return;
+                    if (friendlyNames[n] == format.FriendlyName)
+                    {
+                        comboBox.SelectedItem = friendlyNames[n];
+                        return;
+                    }
                 }
-            }
-            Console.WriteLine("Subtitle Format Is Not Supported.");
+                Console.WriteLine("Subtitle Format Is Not Supported.");
+            });
         }
         //=======================================================================================
         public static List<string>? ListGroupNames()
         {
-            string fileContent = Tools.Resource.GetResourceTextFile(ResourcePath);
-            //var listGN = new List<string>();
+            //string fileContent = Tools.Resource.GetResourceTextFile(ResourcePath);
+            //string fileContent = File.ReadAllText(ReplaceListPath);
             List<string> listGN = new();
-            XmlDocument docGN = new();
-            if (fileContent != null)
-            {
-                docGN.LoadXml(fileContent);
-                XmlNodeList nodesGN = docGN.GetElementsByTagName("Group");
-                foreach (XmlNode node in nodesGN)
-                {
-                    foreach (XmlNode childN in node.SelectNodes("Name"))
-                    {
-                        if (childN.InnerText != exception1 || childN.InnerText != exception2 || childN.InnerText != exception3)
-                            listGN.Add(childN.InnerText);
-                    }
-                }
-                return listGN;
-            }
-            else
+            XDocument replaceList = new();
+            replaceList = XDocument.Load(ReplaceListPath, LoadOptions.None);
+            var nodesGroups = replaceList.Root.Elements().Elements();
+
+            if (!nodesGroups.Any())
                 return null;
+            else
+            {
+                for (int a = 0; a < nodesGroups.Count(); a++)
+                {
+                    var node = nodesGroups.ToList()[a];
+                    bool groupEnabled = node.Element("Enabled") == null || Convert.ToBoolean(node.Element("Enabled").Value);
+                    if (groupEnabled)
+                        listGN.Add(node.Element("Name").Value);
+                }
+            }
+
+            return listGN;
         }
         //=======================================================================================
         public static string FileDlgFilter()
@@ -459,6 +306,165 @@ namespace PersianSubtitleFixes.msmh
                 return sfd;
             }
             // Using: var FileDialog1 = PSF.SaveFileDlg;
+        }
+        //=======================================================================================
+        public static void LoadColumnsLoadState(CustomDataGridView dgv)
+        {
+            dgv.InvokeIt(() =>
+            {
+                // Remove All Columns
+                dgv.Columns.Clear();
+
+                // Add Line# Column
+                DataGridViewTextBoxColumn LineColumn = new();
+                LineColumn.HeaderText = "Line#";
+                LineColumn.ReadOnly = true;
+                LineColumn.Resizable = DataGridViewTriState.False;
+                LineColumn.SortMode = DataGridViewColumnSortMode.NotSortable;
+                LineColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                LineColumn.CellTemplate = new DataGridViewTextBoxCell();
+                LineColumn.ValueType = typeof(string);
+                dgv.Columns.Add(LineColumn);
+
+                // Add StartTime Column
+                DataGridViewTextBoxColumn StartTimeColumn = new();
+                StartTimeColumn.HeaderText = "Start time";
+                StartTimeColumn.ReadOnly = true;
+                StartTimeColumn.Resizable = DataGridViewTriState.False;
+                StartTimeColumn.SortMode = DataGridViewColumnSortMode.NotSortable;
+                StartTimeColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                StartTimeColumn.CellTemplate = new DataGridViewTextBoxCell();
+                StartTimeColumn.ValueType = typeof(string);
+                dgv.Columns.Add(StartTimeColumn);
+
+                // Add EndTime Column
+                DataGridViewTextBoxColumn EndTimeColumn = new();
+                EndTimeColumn.HeaderText = "End time";
+                EndTimeColumn.ReadOnly = true;
+                EndTimeColumn.Resizable = DataGridViewTriState.False;
+                EndTimeColumn.SortMode = DataGridViewColumnSortMode.NotSortable;
+                EndTimeColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                EndTimeColumn.CellTemplate = new DataGridViewTextBoxCell();
+                EndTimeColumn.ValueType = typeof(string);
+                dgv.Columns.Add(EndTimeColumn);
+
+                // Add Duration Column
+                DataGridViewTextBoxColumn DurationColumn = new();
+                DurationColumn.HeaderText = "Duration";
+                DurationColumn.ReadOnly = true;
+                DurationColumn.Resizable = DataGridViewTriState.False;
+                DurationColumn.SortMode = DataGridViewColumnSortMode.NotSortable;
+                DurationColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                DurationColumn.CellTemplate = new DataGridViewTextBoxCell();
+                DurationColumn.ValueType = typeof(string);
+                dgv.Columns.Add(DurationColumn);
+
+                // Add Text Column
+                DataGridViewTextBoxColumn TextColumn = new();
+                TextColumn.HeaderText = "Text";
+                TextColumn.ReadOnly = true;
+                TextColumn.Resizable = DataGridViewTriState.False;
+                TextColumn.SortMode = DataGridViewColumnSortMode.NotSortable;
+                TextColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                TextColumn.CellTemplate = new DataGridViewTextBoxCell();
+                TextColumn.ValueType = typeof(string);
+                dgv.Columns.Add(TextColumn);
+            });
+            
+        }
+        //---------------------------------------------------------------------------------------
+        public static void LoadColumnsApplyState(CustomDataGridView dgv)
+        {
+            dgv.InvokeIt(() =>
+            {
+                // Remove All Columns
+                dgv.Columns.Clear();
+
+                // Add Apply Column
+                DataGridViewCheckBoxColumn ApplyColumn = new();
+                ApplyColumn.HeaderText = "Apply";
+                ApplyColumn.ReadOnly = false;
+                ApplyColumn.Resizable = DataGridViewTriState.False;
+                ApplyColumn.SortMode = DataGridViewColumnSortMode.NotSortable;
+                ApplyColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
+                ApplyColumn.CellTemplate = new DataGridViewCheckBoxCell();
+                ApplyColumn.ValueType = typeof(bool);
+                dgv.Columns.Add(ApplyColumn);
+
+                // Add Line# Column
+                DataGridViewTextBoxColumn LineColumn = new();
+                LineColumn.HeaderText = "Line#";
+                LineColumn.ReadOnly = true;
+                LineColumn.Resizable = DataGridViewTriState.False;
+                LineColumn.SortMode = DataGridViewColumnSortMode.NotSortable;
+                LineColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                LineColumn.CellTemplate = new DataGridViewTextBoxCell();
+                LineColumn.ValueType = typeof(string);
+                dgv.Columns.Add(LineColumn);
+
+                // Add Before Column
+                DataGridViewTextBoxColumn BeforeColumn = new();
+                BeforeColumn.HeaderText = "Before";
+                BeforeColumn.ReadOnly = true;
+                BeforeColumn.Resizable = DataGridViewTriState.True;
+                BeforeColumn.SortMode = DataGridViewColumnSortMode.NotSortable;
+                BeforeColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+                BeforeColumn.Width = 400;
+                BeforeColumn.CellTemplate = new DataGridViewTextBoxCell();
+                BeforeColumn.ValueType = typeof(string);
+                dgv.Columns.Add(BeforeColumn);
+
+                // Add After Column
+                DataGridViewTextBoxColumn AfterColumn = new();
+                AfterColumn.HeaderText = "After";
+                AfterColumn.ReadOnly = true;
+                AfterColumn.Resizable = DataGridViewTriState.False;
+                AfterColumn.SortMode = DataGridViewColumnSortMode.NotSortable;
+                AfterColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                AfterColumn.CellTemplate = new DataGridViewTextBoxCell();
+                AfterColumn.ValueType = typeof(string);
+                dgv.Columns.Add(AfterColumn);
+            });
+        }
+        //=======================================================================================
+        public static int FramesToMillisecondsMax999(double frames)
+        {
+            int ms = (int)Math.Round(frames * (TimeCode.BaseUnit / GetFrameForCalculation(Configuration.Settings.General.CurrentFrameRate)));
+            return Math.Min(ms, 999);
+        }
+
+        public static int FramesToMilliseconds(double frames)
+        {
+            return (int)Math.Round(frames * (TimeCode.BaseUnit / GetFrameForCalculation(Configuration.Settings.General.CurrentFrameRate)));
+            
+        }
+
+        public static int MillisecondsToFrames(double milliseconds)
+        {
+            return MillisecondsToFrames(milliseconds, Configuration.Settings.General.CurrentFrameRate);
+        }
+
+        public static int MillisecondsToFrames(double milliseconds, double frameRate)
+        {
+            return (int)Math.Round(milliseconds / (TimeCode.BaseUnit / GetFrameForCalculation(frameRate)), MidpointRounding.AwayFromZero);
+        }
+
+        private static double GetFrameForCalculation(double frameRate)
+        {
+            if (Math.Abs(frameRate - 23.976) < 0.01)
+            {
+                return 24000.0 / 1001.0;
+            }
+            if (Math.Abs(frameRate - 29.97) < 0.01)
+            {
+                return 30000.0 / 1001.0;
+            }
+            if (Math.Abs(frameRate - 59.94) < 0.01)
+            {
+                return 60000.0 / 1001.0;
+            }
+
+            return frameRate;
         }
         //=======================================================================================
         public static int CountGroupNames()

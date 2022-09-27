@@ -1,21 +1,22 @@
-﻿using System;
+﻿using MsmhTools;
+using System;
 using System.ComponentModel;
-using System.Drawing;
-using System.Text;
-using System.Windows.Forms;
 using System.Windows.Forms.Design;
 using System.Diagnostics;
+/*
+* Copyright MSasanMH, May 10, 2022.
+*/
 
 namespace CustomControls
 {
     [Designer(typeof(ScrollBarControlDesigner))]
     public class CustomVScrollBar : UserControl
     {
-        protected int mLargeChange = 10;
-        protected int mSmallChange = 1;
-        protected int mMinimum = 0;
-        protected int mMaximum = 100;
-        protected int mValue = 0;
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [Obsolete("Mark as deprecated.", true)]
+        public new BorderStyle BorderStyle { get; set; }
+
         protected int mNewValue = 0;
         private int nClickPoint;
 
@@ -30,7 +31,9 @@ namespace CustomControls
         public new event EventHandler<EventArgs> Scroll = null;
         public event EventHandler? ValueChanged = null;
 
-        private static readonly int ScrollBarWidth = 15;
+        private static readonly int ScrollBarWidth = 16;
+        private static readonly int ScrollBarWidthMin = 14;
+        private static readonly int ScrollBarWidthMax = 30;
         private static readonly int ThumbMinHeight = 20;
         private static Size UpArrow = new(ScrollBarWidth, ScrollBarWidth);
         private static Size Thumb = new(ScrollBarWidth, ThumbMinHeight);
@@ -40,95 +43,61 @@ namespace CustomControls
         private static Rectangle rectUpArrow;
         private static Rectangle rectThumb;
         private static Rectangle rectDownArrow;
-        private bool once = true;
 
-        public CustomVScrollBar() : base()
+        private Color mBackColor = Color.DimGray;
+        [EditorBrowsable(EditorBrowsableState.Always), Browsable(true)]
+        [Editor(typeof(WindowsFormsComponentEditor), typeof(Color))]
+        [Category("Appearance"), Description("Back Color")]
+        public override Color BackColor
         {
-            InitializeComponent();
-            SetStyle(ControlStyles.ResizeRedraw, true);
-            SetStyle(ControlStyles.AllPaintingInWmPaint, true);
-            SetStyle(ControlStyles.DoubleBuffer, true);
-            
-            Width = ScrollBarWidth;
-            base.MinimumSize = new Size(ScrollBarWidth, UpArrow.Height + Thumb.Height + DownArrow.Height);
-            MouseMove += CustomVScrollBar_MouseMove;
-            LocationChanged += CustomVScrollBar_LocationChanged;
-            Move += CustomVScrollBar_Move;
-            EnabledChanged += CustomScrollBar_EnabledChanged;
-            Application.Idle += Application_Idle;
-        }
-
-        private void Application_Idle(object? sender, EventArgs e)
-        {
-            if (Parent != null)
+            get { return mBackColor; }
+            set
             {
-                if (once == true)
+                if (mBackColor != value)
                 {
-                    Parent.MouseWheel -= Parent_MouseWheel;
-                    Parent.MouseWheel += Parent_MouseWheel;
-                    Parent.Move -= Parent_Move;
-                    Parent.Move += Parent_Move;
+                    mBackColor = value;
                     Invalidate();
-                    once = false;
                 }
             }
         }
 
-        private void Parent_Move(object? sender, EventArgs e)
+        private Color mForeColor = Color.White;
+        [EditorBrowsable(EditorBrowsableState.Always), Browsable(true)]
+        [Editor(typeof(WindowsFormsComponentEditor), typeof(Color))]
+        [Category("Appearance"), Description("Fore Color")]
+        public override Color ForeColor
         {
-            Invalidate();
-        }
-
-        private void Parent_MouseWheel(object? sender, MouseEventArgs e)
-        {
-            CustomScrollBar_MouseWheel(sender, e);
-        }
-
-        private void CustomVScrollBar_MouseMove(object? sender, MouseEventArgs e)
-        {
-            var csb = sender as CustomVScrollBar;
-            csb.Invalidate();
-        }
-
-        private void CustomVScrollBar_LocationChanged(object? sender, EventArgs e)
-        {
-            var csb = sender as CustomVScrollBar;
-            csb.Invalidate();
-        }
-
-        private void CustomVScrollBar_Move(object? sender, EventArgs e)
-        {
-            var csb = sender as CustomVScrollBar;
-            csb.Invalidate();
-        }
-
-        private void CustomScrollBar_EnabledChanged(object? sender, EventArgs e)
-        {
-            var csb = sender as CustomVScrollBar;
-            csb.Invalidate();
-        }
-
-        private float GetThumbHeight()
-        {
-            int nTrackHeight = Height - (UpArrow.Height + DownArrow.Height);
-            //float eachRowHeight = nTrackHeight / (float)LargeChange;
-            float fThumbHeight = (float)LargeChange / Maximum * nTrackHeight;
-            int nThumbHeight = (int)fThumbHeight;
-            if (nThumbHeight < ThumbMinHeight)
+            get { return mForeColor; }
+            set
             {
-                nThumbHeight = ThumbMinHeight;
-                fThumbHeight = (float)ThumbMinHeight;
+                if (mForeColor != value)
+                {
+                    mForeColor = value;
+                    Invalidate();
+                }
             }
-            else if (nThumbHeight > nTrackHeight)
-            {
-                nThumbHeight = nTrackHeight;
-                fThumbHeight = (float)nTrackHeight;
-            }
-            Thumb.Height = nThumbHeight;
-            return fThumbHeight;
         }
 
-        [EditorBrowsable(EditorBrowsableState.Always), Browsable(true), DefaultValue(false), Category("Behavior"), Description("LargeChange")]
+        private Color mBorderColor = Color.Red;
+        [EditorBrowsable(EditorBrowsableState.Always), Browsable(true)]
+        [Editor(typeof(WindowsFormsComponentEditor), typeof(Color))]
+        [Category("Appearance"), Description("Border Color")]
+        public Color BorderColor
+        {
+            get { return mBorderColor; }
+            set
+            {
+                if (mBorderColor != value)
+                {
+                    mBorderColor = value;
+                    Invalidate();
+                }
+            }
+        }
+
+        protected int mLargeChange = 10;
+        [EditorBrowsable(EditorBrowsableState.Always), Browsable(true)]
+        [Category("Behavior"), Description("Large Change")]
         public int LargeChange
         {
             get { return mLargeChange; }
@@ -139,7 +108,9 @@ namespace CustomControls
             }
         }
 
-        [EditorBrowsable(EditorBrowsableState.Always), Browsable(true), DefaultValue(false), Category("Behavior"), Description("SmallChange")]
+        protected int mSmallChange = 1;
+        [EditorBrowsable(EditorBrowsableState.Always), Browsable(true)]
+        [Category("Behavior"), Description("Small Change")]
         public int SmallChange
         {
             get { return mSmallChange; }
@@ -150,7 +121,9 @@ namespace CustomControls
             }
         }
 
-        [EditorBrowsable(EditorBrowsableState.Always), Browsable(true), DefaultValue(false), Category("Behavior"), Description("Minimum")]
+        protected int mMinimum = 0;
+        [EditorBrowsable(EditorBrowsableState.Always), Browsable(true)]
+        [Category("Behavior"), Description("Minimum")]
         public int Minimum
         {
             get { return mMinimum; }
@@ -161,7 +134,9 @@ namespace CustomControls
             }
         }
 
-        [EditorBrowsable(EditorBrowsableState.Always), Browsable(true), DefaultValue(false), Category("Behavior"), Description("Maximum")]
+        protected int mMaximum = 100;
+        [EditorBrowsable(EditorBrowsableState.Always), Browsable(true)]
+        [Category("Behavior"), Description("Maximum")]
         public int Maximum
         {
             get { return mMaximum; }
@@ -172,7 +147,9 @@ namespace CustomControls
             }
         }
 
-        [EditorBrowsable(EditorBrowsableState.Always), Browsable(true), DefaultValue(false), Category("Behavior"), Description("Value")]
+        protected int mValue = 0;
+        [EditorBrowsable(EditorBrowsableState.Always), Browsable(true)]
+        [Category("Behavior"), Description("Value")]
         public int Value
         {
             get
@@ -190,7 +167,7 @@ namespace CustomControls
                 int nTrackHeight = Height - (UpArrow.Height + DownArrow.Height);
                 int nThumbHeight = (int)GetThumbHeight();
 
-                //Compute Value
+                // Compute Value
                 int nPixelRange = nTrackHeight - nThumbHeight;
                 int nRealRange = Maximum - Minimum - LargeChange;
                 float fPerc = 0.0f;
@@ -201,103 +178,13 @@ namespace CustomControls
 
                 float fTop = fPerc * nPixelRange;
                 mThumbTop = (int)fTop;
-
                 Invalidate();
             }
         }
 
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            Thumb.Height = (int)GetThumbHeight();
-
-            e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
-
-            Color BorderColor;
-            if (Enabled)
-            {
-                BackColor = Colors.BackColor;
-                ForeColor = Colors.ForeColor;
-                BorderColor = Colors.Border;
-            }
-            else
-            {
-                BackColor = Colors.BackColorDisabled;
-                ForeColor = Colors.ForeColorDisabled;
-                BorderColor = Colors.BorderDisabled;
-            }
-
-            // Fill Background
-            using Brush sb0 = new SolidBrush(BackColor);
-            rect = new(0, 0, Width, Height);
-            e.Graphics.FillRectangle(sb0, rect);
-
-            // Draw Up Arrow BG
-            using SolidBrush sbUpArrow = new(ForeColor);
-            rectUpArrow = new(rect.X + 2, rect.Y, rect.Width - 4, UpArrow.Height);
-            e.Graphics.FillRectangle(sbUpArrow, rectUpArrow);
-            // Draw Spaces
-            using Pen penUpArrow = new(BackColor);
-            e.Graphics.DrawLine(penUpArrow, rectUpArrow.X, rectUpArrow.Y, rectUpArrow.X + rectUpArrow.Width - 1, rectUpArrow.Y);
-            e.Graphics.DrawLine(penUpArrow, rectUpArrow.X, rectUpArrow.Y + 1, rectUpArrow.X + rectUpArrow.Width - 1, rectUpArrow.Y + 1);
-            e.Graphics.DrawLine(penUpArrow, rectUpArrow.X, rectUpArrow.Y + rectUpArrow.Height - 1, rectUpArrow.X + rectUpArrow.Width - 1, rectUpArrow.Y + rectUpArrow.Height - 1);
-            // Draw Arrow Button Icon
-            var pthUpArrow = new System.Drawing.Drawing2D.GraphicsPath();
-            var TopUpArrow = new PointF(rectUpArrow.X + rectUpArrow.Width / 2, rectUpArrow.Y + rectUpArrow.Height * 2 / 5);
-            var ButtomLeftUpArrow = new PointF(rectUpArrow.X + rectUpArrow.Width * 1 / 5, rectUpArrow.Y + rectUpArrow.Height * 3 / 5);
-            var BottomRightUpArrow = new PointF(rectUpArrow.X + rectUpArrow.Width * 4 / 5, rectUpArrow.Y + rectUpArrow.Height * 3 / 5);
-            pthUpArrow.AddLine(TopUpArrow, ButtomLeftUpArrow);
-            pthUpArrow.AddLine(ButtomLeftUpArrow, BottomRightUpArrow);
-            // Determine the arrow's color.
-            using SolidBrush arrowBrushUpArrow = new(BackColor);
-            // Draw the arrow
-            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-            e.Graphics.FillPath(arrowBrushUpArrow, pthUpArrow);
-            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.Default;
-
-            //Thumb Location
-            int nTop = mThumbTop;
-            nTop += UpArrow.Height;
-
-            //Draw Thumb
-            using SolidBrush sb3 = new(ForeColor);
-            rectThumb = new(rectUpArrow.X, nTop, rectUpArrow.Width, Thumb.Height);
-            e.Graphics.FillRectangle(sb3, rectThumb);
-
-            // Draw Down Arrow BG
-            using SolidBrush sbDownArrow = new(ForeColor);
-            rectDownArrow = new(rectUpArrow.X, Height - DownArrow.Height, rectUpArrow.Width, DownArrow.Height);
-            e.Graphics.FillRectangle(sbDownArrow, rectDownArrow);
-            // Draw Spaces
-            using Pen penDownArrow = new(BackColor);
-            e.Graphics.DrawLine(penDownArrow, rectDownArrow.X, rectDownArrow.Y, rectDownArrow.X + rectDownArrow.Width - 1, rectDownArrow.Y);
-            e.Graphics.DrawLine(penDownArrow, rectDownArrow.X, rectDownArrow.Y + rectDownArrow.Height - 1, rectDownArrow.X + rectDownArrow.Width - 1, rectDownArrow.Y + rectDownArrow.Height - 1);
-            e.Graphics.DrawLine(penDownArrow, rectDownArrow.X, rectDownArrow.Y + rectDownArrow.Height - 2, rectDownArrow.X + rectDownArrow.Width - 1, rectDownArrow.Y + rectDownArrow.Height - 2);
-            // Draw Arrow Button Icon
-            var pthDownArrow = new System.Drawing.Drawing2D.GraphicsPath();
-            var TopLeftDownArrow = new PointF(rectDownArrow.X + rectDownArrow.Width * 1 / 5, rectDownArrow.Y + rectDownArrow.Height * 2 / 5);
-            var TopRightDownArrow = new PointF(rectDownArrow.X + rectDownArrow.Width * 4 / 5, rectDownArrow.Y + rectDownArrow.Height * 2 / 5);
-            var BottomDownArrow = new PointF(rectDownArrow.X + rectDownArrow.Width / 2, rectDownArrow.Y + rectDownArrow.Height * 3 / 5);
-            pthDownArrow.AddLine(TopLeftDownArrow, TopRightDownArrow);
-            pthDownArrow.AddLine(TopRightDownArrow, BottomDownArrow);
-            // Determine the arrow's color.
-            using SolidBrush arrowBrushDownArrow = new(BackColor);
-            // Draw the arrow
-            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-            e.Graphics.FillPath(arrowBrushDownArrow, pthDownArrow);
-            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.Default;
-
-            // Draw Border
-            using Pen penBorder = new(BorderColor);
-            Rectangle rectBorder = new(rect.X, rect.Y, rect.Width - 1, rect.Height - 1);
-            e.Graphics.DrawRectangle(penBorder, rectBorder);
-        }
-
         public override bool AutoSize
         {
-            get
-            {
-                return base.AutoSize;
-            }
+            get { return base.AutoSize; }
             set
             {
                 base.AutoSize = value;
@@ -308,19 +195,90 @@ namespace CustomControls
             }
         }
 
-        private void InitializeComponent()
+        private static Color[]? OriginalColors;
+        private bool once = true;
+
+        public CustomVScrollBar() : base()
         {
             SuspendLayout();
-            Name = "CustomScrollBar";
-            MouseWheel += new MouseEventHandler(CustomScrollBar_MouseWheel);
-            MouseDown += new MouseEventHandler(CustomScrollBar_MouseDown);
-            MouseMove += new MouseEventHandler(CustomScrollBar_MouseMove);
-            MouseUp += new MouseEventHandler(CustomScrollBar_MouseUp);
+            Name = "CustomVScrollBar";
+            SetStyle(ControlStyles.AllPaintingInWmPaint |
+                     ControlStyles.OptimizedDoubleBuffer |
+                     ControlStyles.ResizeRedraw |
+                     ControlStyles.UserPaint, true);
+
+            Width = ScrollBarWidth;
+            base.MinimumSize = new Size(ScrollBarWidthMin, UpArrow.Height + Thumb.Height + DownArrow.Height);
+
+            // Events
+            MouseWheel += CustomVScrollBar_MouseWheel;
+            MouseDown += CustomVScrollBar_MouseDown;
+            MouseMove += CustomVScrollBar_MouseMove;
+            MouseUp += CustomVScrollBar_MouseUp;
+            LocationChanged += CustomVScrollBar_LocationChanged;
+            Move += CustomVScrollBar_Move;
+            EnabledChanged += CustomVScrollBar_EnabledChanged;
+            Application.Idle += Application_Idle;
             ResumeLayout(false);
         }
 
-        private void CustomScrollBar_MouseWheel(object? sender, MouseEventArgs e)
+        private void Application_Idle(object? sender, EventArgs e)
         {
+            if (Parent != null && FindForm() != null)
+            {
+                if (once)
+                {
+                    Parent.MouseWheel -= Parent_MouseWheel;
+                    Parent.MouseWheel += Parent_MouseWheel;
+                    Control topParent = FindForm();
+                    topParent.Move -= TopParent_Move;
+                    topParent.Move += TopParent_Move;
+                    Parent.Move -= Parent_Move;
+                    Parent.Move += Parent_Move;
+                    Invalidate();
+                    once = false;
+                }
+            }
+        }
+
+        private void TopParent_Move(object? sender, EventArgs e)
+        {
+            Invalidate();
+        }
+
+        private void Parent_Move(object? sender, EventArgs e)
+        {
+            Invalidate();
+        }
+
+        private void Parent_MouseWheel(object? sender, MouseEventArgs e)
+        {
+            CustomVScrollBar_MouseWheel(sender, e);
+        }
+
+        private void CustomVScrollBar_LocationChanged(object? sender, EventArgs e)
+        {
+            var csb = sender as CustomVScrollBar;
+            csb.Invalidate();
+        }
+
+        private void CustomVScrollBar_Move(object? sender, EventArgs e)
+        {
+            var csb = sender as CustomVScrollBar;
+            csb.Invalidate();
+        }
+
+        private void CustomVScrollBar_EnabledChanged(object? sender, EventArgs e)
+        {
+            var csb = sender as CustomVScrollBar;
+            csb.Invalidate();
+        }
+
+        private void CustomVScrollBar_MouseWheel(object? sender, MouseEventArgs e)
+        {
+            if (!Enabled)
+                return;
+
             int nTrackHeight = Height - (UpArrow.Height + DownArrow.Height);
             int nThumbHeight = (int)GetThumbHeight();
 
@@ -354,14 +312,11 @@ namespace CustomControls
                 }
             }
 
-            if (ValueChanged != null)
-                ValueChanged(this, new EventArgs());
-
-            if (Scroll != null)
-                Scroll(this, new EventArgs());
+            ValueChanged?.Invoke(this, new EventArgs());
+            Scroll?.Invoke(this, new EventArgs());
         }
 
-        private void CustomScrollBar_MouseDown(object? sender, MouseEventArgs e)
+        private void CustomVScrollBar_MouseDown(object? sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right || e.Button == MouseButtons.Middle)
                 return;
@@ -392,11 +347,8 @@ namespace CustomControls
                             MoveThumb(e.Y);
                             Debug.WriteLine(Value);
 
-                            if (ValueChanged != null)
-                                ValueChanged(this, new EventArgs());
-
-                            if (Scroll != null)
-                                Scroll(this, new EventArgs());
+                            ValueChanged?.Invoke(this, new EventArgs());
+                            Scroll?.Invoke(this, new EventArgs());
 
                             Invalidate();
                             Task.Delay(10).Wait();
@@ -419,7 +371,7 @@ namespace CustomControls
                         while (mDown == true)
                         {
                             Value -= LargeChange;
-                            if (mThumbTop + Thumb.Height < e.Y)
+                            if (mThumbTop + UpArrow.Height < e.Y)
                             {
                                 if (mThumbTop <= 0)
                                 {
@@ -506,11 +458,8 @@ namespace CustomControls
                             MoveThumb(e.Y);
                             Debug.WriteLine(Value);
 
-                            if (ValueChanged != null)
-                                ValueChanged(this, new EventArgs());
-
-                            if (Scroll != null)
-                                Scroll(this, new EventArgs());
+                            ValueChanged?.Invoke(this, new EventArgs());
+                            Scroll?.Invoke(this, new EventArgs());
 
                             Invalidate();
                             Task.Delay(10).Wait();
@@ -523,7 +472,7 @@ namespace CustomControls
             }
         }
 
-        private void CustomScrollBar_MouseUp(object? sender, MouseEventArgs e)
+        private void CustomVScrollBar_MouseUp(object? sender, MouseEventArgs e)
         {
             Debug.WriteLine("Mouse Up");
             mThumbDown = false;
@@ -531,12 +480,168 @@ namespace CustomControls
             mDown = false;
         }
 
+        private void CustomVScrollBar_MouseMove(object? sender, MouseEventArgs e)
+        {
+            if (mThumbDown == true)
+            {
+                mThumbDragging = true;
+            }
+
+            if (mThumbDragging)
+            {
+                MoveThumb(e.Y);
+            }
+
+            ValueChanged?.Invoke(this, new EventArgs());
+            Scroll?.Invoke(this, new EventArgs());
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            // Update Colors
+            OriginalColors = new Color[] { BackColor, ForeColor, BorderColor };
+
+            // Set Maximum Size
+            Width = Math.Min(Width, ScrollBarWidthMax);
+
+            // Update Size
+            UpArrow = new(Width, Width);
+            Thumb = new(Width, (int)GetThumbHeight());
+            DownArrow = new(Width, Width);
+            base.MinimumSize = new Size(ScrollBarWidthMin, UpArrow.Height + ThumbMinHeight + DownArrow.Height);
+
+            //Thumb.Height = (int)GetThumbHeight();
+
+            e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+
+            if (OriginalColors == null)
+                return;
+
+            Color backColor;
+            Color foreColor;
+            Color borderColor;
+
+            if (Enabled)
+            {
+                backColor = OriginalColors[0];
+                foreColor = OriginalColors[1];
+                borderColor = OriginalColors[2];
+            }
+            else
+            {
+                // Disabled Colors
+                if (OriginalColors[0].DarkOrLight() == "Dark")
+                    backColor = OriginalColors[0].ChangeBrightness(0.3f);
+                else
+                    backColor = OriginalColors[0].ChangeBrightness(-0.3f);
+
+                if (OriginalColors[1].DarkOrLight() == "Dark")
+                    foreColor = OriginalColors[1].ChangeBrightness(0.2f);
+                else
+                    foreColor = OriginalColors[1].ChangeBrightness(-0.2f);
+
+                if (OriginalColors[2].DarkOrLight() == "Dark")
+                    borderColor = OriginalColors[2].ChangeBrightness(0.3f);
+                else
+                    borderColor = OriginalColors[2].ChangeBrightness(-0.3f);
+            }
+
+            // Fill Background
+            using Brush sb0 = new SolidBrush(backColor);
+            rect = new(0, 0, Width, Height);
+            e.Graphics.FillRectangle(sb0, rect);
+
+            // Draw Up Arrow BG
+            using SolidBrush sbUpArrow = new(foreColor);
+            rectUpArrow = new(rect.X + 2, rect.Y, rect.Width - 4, UpArrow.Height);
+            e.Graphics.FillRectangle(sbUpArrow, rectUpArrow);
+
+            // Draw Up Spaces
+            using Pen penUpArrow = new(backColor);
+            e.Graphics.DrawLine(penUpArrow, rectUpArrow.X, rectUpArrow.Y, rectUpArrow.X + rectUpArrow.Width - 1, rectUpArrow.Y);
+            e.Graphics.DrawLine(penUpArrow, rectUpArrow.X, rectUpArrow.Y + 1, rectUpArrow.X + rectUpArrow.Width - 1, rectUpArrow.Y + 1);
+            e.Graphics.DrawLine(penUpArrow, rectUpArrow.X, rectUpArrow.Y + rectUpArrow.Height - 1, rectUpArrow.X + rectUpArrow.Width - 1, rectUpArrow.Y + rectUpArrow.Height - 1);
+
+            // Draw Up Arrow Button Icon
+            var pthUpArrow = new System.Drawing.Drawing2D.GraphicsPath();
+            var TopUpArrow = new PointF(rectUpArrow.X + rectUpArrow.Width / 2, rectUpArrow.Y + rectUpArrow.Height * 2 / 5);
+            var ButtomLeftUpArrow = new PointF(rectUpArrow.X + rectUpArrow.Width * 1 / 5, rectUpArrow.Y + rectUpArrow.Height * 3 / 5);
+            var BottomRightUpArrow = new PointF(rectUpArrow.X + rectUpArrow.Width * 4 / 5, rectUpArrow.Y + rectUpArrow.Height * 3 / 5);
+            pthUpArrow.AddLine(TopUpArrow, ButtomLeftUpArrow);
+            pthUpArrow.AddLine(ButtomLeftUpArrow, BottomRightUpArrow);
+
+            // Draw Up Arrow
+            using SolidBrush arrowBrushUpArrow = new(backColor);
+            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            e.Graphics.FillPath(arrowBrushUpArrow, pthUpArrow);
+            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.Default;
+
+            //Thumb Location
+            int nTop = mThumbTop;
+            nTop += UpArrow.Height;
+
+            //Draw Thumb
+            using SolidBrush sb3 = new(foreColor);
+            rectThumb = new(rectUpArrow.X, nTop, rectUpArrow.Width, Thumb.Height);
+            e.Graphics.FillRectangle(sb3, rectThumb);
+
+            // Draw Down Arrow BG
+            using SolidBrush sbDownArrow = new(foreColor);
+            rectDownArrow = new(rectUpArrow.X, Height - DownArrow.Height, rectUpArrow.Width, DownArrow.Height);
+            e.Graphics.FillRectangle(sbDownArrow, rectDownArrow);
+
+            // Draw Down Spaces
+            using Pen penDownArrow = new(backColor);
+            e.Graphics.DrawLine(penDownArrow, rectDownArrow.X, rectDownArrow.Y, rectDownArrow.X + rectDownArrow.Width - 1, rectDownArrow.Y);
+            e.Graphics.DrawLine(penDownArrow, rectDownArrow.X, rectDownArrow.Y + rectDownArrow.Height - 1, rectDownArrow.X + rectDownArrow.Width - 1, rectDownArrow.Y + rectDownArrow.Height - 1);
+            e.Graphics.DrawLine(penDownArrow, rectDownArrow.X, rectDownArrow.Y + rectDownArrow.Height - 2, rectDownArrow.X + rectDownArrow.Width - 1, rectDownArrow.Y + rectDownArrow.Height - 2);
+
+            // Draw Down Arrow Button Icon
+            var pthDownArrow = new System.Drawing.Drawing2D.GraphicsPath();
+            var TopLeftDownArrow = new PointF(rectDownArrow.X + rectDownArrow.Width * 1 / 5, rectDownArrow.Y + rectDownArrow.Height * 2 / 5);
+            var TopRightDownArrow = new PointF(rectDownArrow.X + rectDownArrow.Width * 4 / 5, rectDownArrow.Y + rectDownArrow.Height * 2 / 5);
+            var BottomDownArrow = new PointF(rectDownArrow.X + rectDownArrow.Width / 2, rectDownArrow.Y + rectDownArrow.Height * 3 / 5);
+            pthDownArrow.AddLine(TopLeftDownArrow, TopRightDownArrow);
+            pthDownArrow.AddLine(TopRightDownArrow, BottomDownArrow);
+
+            // Draw Down Arrow
+            using SolidBrush arrowBrushDownArrow = new(backColor);
+            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            e.Graphics.FillPath(arrowBrushDownArrow, pthDownArrow);
+            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.Default;
+
+            // Draw Border
+            using Pen penBorder = new(borderColor);
+            Rectangle rectBorder = new(rect.X, rect.Y, rect.Width - 1, rect.Height - 1);
+            e.Graphics.DrawRectangle(penBorder, rectBorder);
+        }
+
+        private float GetThumbHeight()
+        {
+            int nTrackHeight = Height - (UpArrow.Height + DownArrow.Height);
+            //float eachRowHeight = nTrackHeight / (float)LargeChange;
+            float fThumbHeight = (float)LargeChange / Maximum * nTrackHeight;
+            int nThumbHeight = (int)fThumbHeight;
+            if (nThumbHeight < ThumbMinHeight)
+            {
+                nThumbHeight = ThumbMinHeight;
+                fThumbHeight = (float)ThumbMinHeight;
+            }
+            else if (nThumbHeight > nTrackHeight)
+            {
+                nThumbHeight = nTrackHeight;
+                fThumbHeight = (float)nTrackHeight;
+            }
+            Thumb.Height = nThumbHeight;
+            return fThumbHeight;
+        }
+
         private void MoveThumb(int y)
         {
             int nRealRange = Maximum - Minimum;
             int nTrackHeight = Height - (UpArrow.Height + DownArrow.Height);
             int nThumbHeight = (int)GetThumbHeight();
-            
+
             int nPixelRange = nTrackHeight - nThumbHeight;
             if (mThumbDown && nRealRange > 0)
             {
@@ -563,7 +668,7 @@ namespace CustomControls
                     float fValue = fPerc * (Maximum - LargeChange);
                     mValue = (int)fValue;
                     Debug.WriteLine(mValue.ToString());
-                    
+
                     Application.DoEvents();
 
                     Invalidate();
@@ -571,24 +676,6 @@ namespace CustomControls
             }
         }
 
-        private void CustomScrollBar_MouseMove(object? sender, MouseEventArgs e)
-        {
-            if (mThumbDown == true)
-            {
-                mThumbDragging = true;
-            }
-
-            if (mThumbDragging)
-            {
-                MoveThumb(e.Y);
-            }
-
-            if (ValueChanged != null)
-                ValueChanged(this, new EventArgs());
-
-            if (Scroll != null)
-                Scroll(this, new EventArgs());
-        }
     }
 
     internal class ScrollBarControlDesigner : ControlDesigner

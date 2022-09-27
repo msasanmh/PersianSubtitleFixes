@@ -10,14 +10,14 @@
     <SignAssembly>False</SignAssembly>
     <Copyright>MSasanMH</Copyright>
     <AssemblyVersion>1.1</AssemblyVersion>
-    <FileVersion>1.0.2</FileVersion>
+    <FileVersion>1.0.3</FileVersion>
     <Product>Persian Subtitle Fixes</Product>
     <NeutralLanguage>en</NeutralLanguage>
     <DebugType>embedded</DebugType>
     <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
     <IsPublishable>True</IsPublishable>
     <ApplicationIcon>Icons\PersianSubtitleFixesIcon.ico</ApplicationIcon>
-    <Version>$(VersionPrefix)1.0.2</Version>
+    <Version>$(VersionPrefix)1.0.3</Version>
     <PackageLicenseFile>C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
 
@@ -101,6 +101,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>SBResource.resx</DependentUpon>
     </Compile>
+    <Compile Update="Guide\ResourceGuide.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ResourceGuide.resx</DependentUpon>
+    </Compile>
     <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -117,6 +122,10 @@
     <EmbeddedResource Update="CustomControls\SBResources\SBResource.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>SBResource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Guide\ResourceGuide.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ResourceGuide.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>

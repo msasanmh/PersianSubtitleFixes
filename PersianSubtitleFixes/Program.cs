@@ -2,6 +2,7 @@ namespace PersianSubtitleFixes
 {
     internal static class Program
     {
+        //public static FormMain MainForm { get; set; } = new FormMain();
         /// <summary>
         ///  The main entry point for the application.
         /// </summary>
@@ -12,6 +13,7 @@ namespace PersianSubtitleFixes
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
             Application.Run(new FormMain());
+            //Application.Run(MainForm);
         }
     }
 }

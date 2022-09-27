@@ -13,14 +13,32 @@
     <Compile Update="CustomControls\CustomComboBox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Update="CustomControls\CustomContextMenuStrip.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Update="CustomControls\CustomDataGridView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="CustomControls\CustomGroupBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="CustomControls\CustomInputBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="CustomControls\CustomLabel.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Update="CustomControls\CustomListView.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Update="CustomControls\CustomMenuStrip.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Update="CustomControls\CustomMessageBox.cs">
       <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="CustomControls\CustomNumericUpDown.cs">
+      <SubType>Component</SubType>
     </Compile>
     <Compile Update="CustomControls\CustomPanel.cs">
       <SubType>Component</SubType>
@@ -28,10 +46,31 @@
     <Compile Update="CustomControls\CustomProgressBar.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Update="CustomControls\CustomRadioButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="CustomControls\CustomStatusStrip.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="CustomControls\CustomTabControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="CustomControls\CustomTextBox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="CustomControls\CustomTimeUpDown.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Update="CustomControls\CustomTitleBar.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="CustomControls\CustomToolStrip.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Update="CustomControls\CustomToolStripComboBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="CustomControls\CustomToolStripTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Update="CustomControls\CustomVScrollBar.cs">
@@ -41,6 +80,9 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="Forms\Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\MultipleReplace.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="Forms\Settings.cs">

@@ -1,0 +1,88 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v6.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v6.0": {
+      "PersianSubtitleFixes/1.0.3": {
+        "dependencies": {
+          "System.Text.Encoding.CodePages": "6.0.0",
+          "Crc32.NET": "1.0.0.0",
+          "libse": "3.6.4.9999",
+          "UtfUnknown": "2.0.0.0"
+        },
+        "runtime": {
+          "PersianSubtitleFixes.dll": {}
+        }
+      },
+      "System.Runtime.CompilerServices.Unsafe/6.0.0": {},
+      "System.Text.Encoding.CodePages/6.0.0": {
+        "dependencies": {
+          "System.Runtime.CompilerServices.Unsafe": "6.0.0"
+        }
+      },
+      "Crc32.NET/1.0.0.0": {
+        "runtime": {
+          "Crc32.NET.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.2.0.5"
+          }
+        }
+      },
+      "libse/3.6.4.9999": {
+        "runtime": {
+          "libse.dll": {
+            "assemblyVersion": "3.6.4.9999",
+            "fileVersion": "3.6.4.9999"
+          }
+        }
+      },
+      "UtfUnknown/2.0.0.0": {
+        "runtime": {
+          "UtfUnknown.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.0.630.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "PersianSubtitleFixes/1.0.3": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "System.Runtime.CompilerServices.Unsafe/6.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-/iUeP3tq1S0XdNNoMz5C9twLSrM/TH+qElHkXWaPvuNOt+99G75NrV0OS2EqHx5wMN7popYjpc8oTjC1y16DLg==",
+      "path": "system.runtime.compilerservices.unsafe/6.0.0",
+      "hashPath": "system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512"
+    },
+    "System.Text.Encoding.CodePages/6.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ZFCILZuOvtKPauZ/j/swhvw68ZRi9ATCfvGbk1QfydmcXBkIWecWKn/250UH7rahZ5OoDBaiAudJtPvLwzw85A==",
+      "path": "system.text.encoding.codepages/6.0.0",
+      "hashPath": "system.text.encoding.codepages.6.0.0.nupkg.sha512"
+    },
+    "Crc32.NET/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "libse/3.6.4.9999": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "UtfUnknown/2.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

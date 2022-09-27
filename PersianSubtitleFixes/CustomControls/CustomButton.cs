@@ -1,6 +1,7 @@
 ﻿using MsmhTools;
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms.Design;
 /*
@@ -11,6 +12,14 @@ namespace CustomControls
 {
     public class CustomButton : Button
     {
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public new FlatButtonAppearance? FlatAppearance { get; set; }
+
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public new TextImageRelation? TextImageRelation { get; set; }
+
         private Color mBackColor = Color.DimGray;
         [EditorBrowsable(EditorBrowsableState.Always), Browsable(true)]
         [Editor(typeof(WindowsFormsComponentEditor), typeof(Color))]
@@ -45,7 +54,7 @@ namespace CustomControls
             }
         }
 
-        private Color mBorderColor = Color.Red;
+        private Color mBorderColor = Color.Blue;
         [EditorBrowsable(EditorBrowsableState.Always), Browsable(true)]
         [Editor(typeof(WindowsFormsComponentEditor), typeof(Color))]
         [Category("Appearance"), Description("Border Color")]
@@ -62,7 +71,7 @@ namespace CustomControls
             }
         }
 
-        private Color mSelectionColor = Color.Blue;
+        private Color mSelectionColor = Color.LightBlue;
         [EditorBrowsable(EditorBrowsableState.Always), Browsable(true)]
         [Editor(typeof(WindowsFormsComponentEditor), typeof(Color))]
         [Category("Appearance"), Description("Selection Color")]
@@ -95,23 +104,21 @@ namespace CustomControls
             }
         }
 
-        private static Color[]? OriginalColors;
-        private static Color BackColorDisabled;
-        private static Color ForeColorDisabled;
-        private static Color BorderColorDisabled;
-        private static bool ButtonMouseHover { get; set; }
-        private static bool ButtonMouseDown { get; set; }
-        private static bool ApplicationIdle = false;
+        private bool ButtonMouseHover { get; set; }
+        private bool ButtonMouseDown { get; set; }
+        private bool ApplicationIdle = false;
         private bool once = true;
 
         public CustomButton() : base()
         {
-            SetStyle(ControlStyles.OptimizedDoubleBuffer |
+            SetStyle(ControlStyles.AllPaintingInWmPaint |
+                     ControlStyles.OptimizedDoubleBuffer |
                      ControlStyles.ResizeRedraw |
                      ControlStyles.UserPaint, true);
-
+            SetStyle(ControlStyles.Opaque, true);
+            
             FlatStyle = FlatStyle.Flat;
-
+            
             Application.Idle += Application_Idle;
             HandleCreated += CustomButton_HandleCreated;
             LocationChanged += CustomButton_LocationChanged;
@@ -127,16 +134,30 @@ namespace CustomControls
         private void Application_Idle(object? sender, EventArgs e)
         {
             ApplicationIdle = true;
-            if (Parent != null)
+            if (Parent != null && FindForm() != null)
             {
-                if (once == true)
+                if (once)
                 {
+                    Control topParent = FindForm();
+                    topParent.Move -= TopParent_Move;
+                    topParent.Move += TopParent_Move;
                     Parent.Move -= Parent_Move;
                     Parent.Move += Parent_Move;
+                    Parent.BackColorChanged += Parent_BackColorChanged;
                     Invalidate();
                     once = false;
                 }
             }
+        }
+
+        private void Parent_BackColorChanged(object? sender, EventArgs e)
+        {
+            Invalidate();
+        }
+
+        private void TopParent_Move(object? sender, EventArgs e)
+        {
+            Invalidate();
         }
 
         private void Parent_Move(object? sender, EventArgs e)
@@ -146,7 +167,6 @@ namespace CustomControls
 
         private void CustomButton_HandleCreated(object? sender, EventArgs e)
         {
-            OriginalColors = new Color[] { mBackColor, mForeColor, mBorderColor, mSelectionColor };
             Invalidate();
         }
 
@@ -209,228 +229,240 @@ namespace CustomControls
 
         private void CustomButton_Paint(object? sender, PaintEventArgs e)
         {
-            // Update Colors
-            OriginalColors = new Color[] { BackColor, ForeColor, BorderColor, SelectionColor };
-
             if (ApplicationIdle == false)
                 return;
 
             if (sender is Button button)
             {
-                Color mouseHoverColor = Color.Empty;
-                Color mouseDownColor = Color.Empty;
+                Color backColor = GetBackColor(button);
+                Color foreColor = GetForeColor();
+                Color borderColor = GetBorderColor();
 
-                if (DesignMode)
+                // Paint Background
+                if (Parent != null)
                 {
-                    BackColor = mBackColor;
-                    ForeColor = mForeColor;
-                    BorderColor = mBorderColor;
-                    SelectionColor = mSelectionColor;
+                    e.Graphics.Clear(Parent.BackColor);
+                    if (Parent.BackColor == Color.Transparent)
+                        if (Parent is TabPage tabPage)
+                        {
+                            if (tabPage.Parent is CustomTabControl customTabControl)
+                                e.Graphics.Clear(customTabControl.BackColor);
+                            else if (tabPage.Parent is TabControl tabControl)
+                                e.Graphics.Clear(tabControl.BackColor);
+                        }
                 }
                 else
-                {
-                    if (OriginalColors == null)
-                        return;
+                    e.Graphics.Clear(backColor);
 
-                    if (button.Enabled)
+                Rectangle rect = new(0, 0, button.ClientSize.Width - 1, button.ClientSize.Height - 1);
+
+                // Paint Button Background
+                using SolidBrush sbBG = new(backColor);
+                e.Graphics.FillRoundedRectangle(sbBG, rect, RoundedCorners, RoundedCorners, RoundedCorners, RoundedCorners);
+
+                // Paint Hover Button Background (// MousePosition Or Cursor.Position) (Faster than rect.Contains(button.PointToClient(MousePosition)))
+                if (button.PointToScreen(Point.Empty).X <= MousePosition.X
+                        && MousePosition.X <= (button.PointToScreen(Point.Empty).X + rect.Width)
+                        && button.PointToScreen(Point.Empty).Y <= MousePosition.Y
+                        && MousePosition.Y <= (button.PointToScreen(Point.Empty).Y + rect.Height))
+                {
+                    if (ButtonMouseHover)
                     {
-                        if (ButtonMouseHover)
+                        if (ButtonMouseDown)
                         {
-                            if (ButtonMouseDown)
-                            {
-                                if (OriginalColors[0].DarkOrLight() == "Dark")
-                                    mouseDownColor = OriginalColors[0].ChangeBrightness(0.2f);
-                                else if (OriginalColors[0].DarkOrLight() == "Light")
-                                    mouseDownColor = OriginalColors[0].ChangeBrightness(-0.2f);
-                            }
+                            Color mouseDownBackColor;
+                            if (backColor.DarkOrLight() == "Dark")
+                                mouseDownBackColor = backColor.ChangeBrightness(0.2f);
                             else
-                            {
-                                if (OriginalColors[0].DarkOrLight() == "Dark")
-                                    mouseHoverColor = OriginalColors[0].ChangeBrightness(0.1f);
-                                else if (OriginalColors[0].DarkOrLight() == "Light")
-                                    mouseHoverColor = OriginalColors[0].ChangeBrightness(-0.1f);
-                            }
+                                mouseDownBackColor = backColor.ChangeBrightness(-0.2f);
+
+                            using SolidBrush sbDBG = new(mouseDownBackColor);
+                            e.Graphics.FillRoundedRectangle(sbDBG, rect, RoundedCorners, RoundedCorners, RoundedCorners, RoundedCorners);
+                            ButtonMouseDown = false; // Fix a minor bug.
                         }
                         else
                         {
-                            BackColor = OriginalColors[0];
-                        }
+                            Color mouseHoverBackColor;
+                            if (backColor.DarkOrLight() == "Dark")
+                                mouseHoverBackColor = BackColor.ChangeBrightness(0.1f);
+                            else
+                                mouseHoverBackColor = BackColor.ChangeBrightness(-0.1f);
 
-                        ForeColor = OriginalColors[1];
-                        BorderColor = OriginalColors[2];
-                        SelectionColor = OriginalColors[3];
+                            using SolidBrush sbHBG = new(mouseHoverBackColor);
+                            e.Graphics.FillRoundedRectangle(sbHBG, rect, RoundedCorners, RoundedCorners, RoundedCorners, RoundedCorners);
+                        }
+                    }
+                }
+
+                if (button.Enabled && button.Focused)
+                {
+                    rect.Inflate(-2, -2);
+                    using Pen pen = new(SelectionColor) { DashStyle = DashStyle.Dash };
+                    //if (RoundedCorners == 0)
+                    //    e.Graphics.DrawRectangle(pen, rect);
+                    //else
+                    e.Graphics.DrawRoundedRectangle(pen, rect, RoundedCorners, RoundedCorners, RoundedCorners, RoundedCorners);
+                    rect.Inflate(+2, +2);
+                }
+
+                // Paint Image
+                if (Image != null)
+                {
+                    Rectangle rectImage = new(0, 0, Image.Width, Image.Height);
+                    int pad = 2;
+                    int top = rect.Y + pad;
+                    int bottom = rect.Y + (rect.Height - rectImage.Height) - pad;
+                    int left = rect.X + pad;
+                    int right = rect.X + (rect.Width - rectImage.Width) - pad;
+                    int centerX = rect.X + ((rect.Width - rectImage.Width) / 2);
+                    int centerY = rect.Y + ((rect.Height - rectImage.Height) / 2);
+                    if (RightToLeft == RightToLeft.No)
+                    {
+                        if (ImageAlign == ContentAlignment.BottomCenter)
+                            rectImage.Location = new(centerX, bottom);
+                        else if (ImageAlign == ContentAlignment.BottomLeft)
+                            rectImage.Location = new(left, bottom);
+                        else if (ImageAlign == ContentAlignment.BottomRight)
+                            rectImage.Location = new(right, bottom);
+                        else if (ImageAlign == ContentAlignment.MiddleCenter)
+                            rectImage.Location = new(centerX, centerY);
+                        else if (ImageAlign == ContentAlignment.MiddleLeft)
+                            rectImage.Location = new(left, centerY);
+                        else if (ImageAlign == ContentAlignment.MiddleRight)
+                            rectImage.Location = new(right, centerY);
+                        else if (ImageAlign == ContentAlignment.TopCenter)
+                            rectImage.Location = new(centerX, top);
+                        else if (ImageAlign == ContentAlignment.TopLeft)
+                            rectImage.Location = new(left, top);
+                        else if (ImageAlign == ContentAlignment.TopRight)
+                            rectImage.Location = new(right, top);
+                        else
+                            rectImage.Location = new(centerX, centerY);
                     }
                     else
                     {
-                        // Disabled Colors
-                        if (OriginalColors[0].DarkOrLight() == "Dark")
-                            BackColorDisabled = OriginalColors[0].ChangeBrightness(0.3f);
-                        else if (OriginalColors[0].DarkOrLight() == "Light")
-                            BackColorDisabled = OriginalColors[0].ChangeBrightness(-0.3f);
-
-                        if (OriginalColors[1].DarkOrLight() == "Dark")
-                            ForeColorDisabled = OriginalColors[1].ChangeBrightness(0.2f);
-                        else if (OriginalColors[1].DarkOrLight() == "Light")
-                            ForeColorDisabled = OriginalColors[1].ChangeBrightness(-0.2f);
-
-                        if (OriginalColors[2].DarkOrLight() == "Dark")
-                            BorderColorDisabled = OriginalColors[2].ChangeBrightness(0.3f);
-                        else if (OriginalColors[2].DarkOrLight() == "Light")
-                            BorderColorDisabled = OriginalColors[2].ChangeBrightness(-0.3f);
+                        if (ImageAlign == ContentAlignment.BottomCenter)
+                            rectImage.Location = new(centerX, bottom);
+                        else if (ImageAlign == ContentAlignment.BottomLeft)
+                            rectImage.Location = new(right, bottom);
+                        else if (ImageAlign == ContentAlignment.BottomRight)
+                            rectImage.Location = new(left, bottom);
+                        else if (ImageAlign == ContentAlignment.MiddleCenter)
+                            rectImage.Location = new(centerX, centerY);
+                        else if (ImageAlign == ContentAlignment.MiddleLeft)
+                            rectImage.Location = new(right, centerY);
+                        else if (ImageAlign == ContentAlignment.MiddleRight)
+                            rectImage.Location = new(left, centerY);
+                        else if (ImageAlign == ContentAlignment.TopCenter)
+                            rectImage.Location = new(centerX, top);
+                        else if (ImageAlign == ContentAlignment.TopLeft)
+                            rectImage.Location = new(right, top);
+                        else if (ImageAlign == ContentAlignment.TopRight)
+                            rectImage.Location = new(left, top);
+                        else
+                            rectImage.Location = new(centerX, centerY);
                     }
+
+                    e.Graphics.DrawImage(Image, rectImage);
                 }
 
-                Color backColor;
-                Color foreColor;
-                Color borderColor;
+                // Paint Button Text
+                TextFormatFlags flags;
 
-                if (button.Enabled)
+                if (RightToLeft == RightToLeft.No)
                 {
-                    backColor = BackColor;
-                    foreColor = ForeColor;
-                    borderColor = BorderColor;
+                    if (TextAlign == ContentAlignment.BottomCenter)
+                        flags = TextFormatFlags.Bottom | TextFormatFlags.HorizontalCenter;
+                    else if (TextAlign == ContentAlignment.BottomLeft)
+                        flags = TextFormatFlags.Bottom | TextFormatFlags.Left;
+                    else if (TextAlign == ContentAlignment.BottomRight)
+                        flags = TextFormatFlags.Bottom | TextFormatFlags.Right;
+                    else if (TextAlign == ContentAlignment.MiddleCenter)
+                        flags = TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter;
+                    else if (TextAlign == ContentAlignment.MiddleLeft)
+                        flags = TextFormatFlags.VerticalCenter | TextFormatFlags.Left;
+                    else if (TextAlign == ContentAlignment.MiddleRight)
+                        flags = TextFormatFlags.VerticalCenter | TextFormatFlags.Right;
+                    else if (TextAlign == ContentAlignment.TopCenter)
+                        flags = TextFormatFlags.Top | TextFormatFlags.HorizontalCenter;
+                    else if (TextAlign == ContentAlignment.TopLeft)
+                        flags = TextFormatFlags.Top | TextFormatFlags.Left;
+                    else if (TextAlign == ContentAlignment.TopRight)
+                        flags = TextFormatFlags.Top | TextFormatFlags.Right;
+                    else
+                        flags = TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter;
                 }
                 else
                 {
-                    backColor = BackColorDisabled;
-                    foreColor = ForeColorDisabled;
-                    borderColor = BorderColorDisabled;
+                    if (TextAlign == ContentAlignment.BottomCenter)
+                        flags = TextFormatFlags.Bottom | TextFormatFlags.HorizontalCenter;
+                    else if (TextAlign == ContentAlignment.BottomLeft)
+                        flags = TextFormatFlags.Bottom | TextFormatFlags.Right;
+                    else if (TextAlign == ContentAlignment.BottomRight)
+                        flags = TextFormatFlags.Bottom | TextFormatFlags.Left;
+                    else if (TextAlign == ContentAlignment.MiddleCenter)
+                        flags = TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter;
+                    else if (TextAlign == ContentAlignment.MiddleLeft)
+                        flags = TextFormatFlags.VerticalCenter | TextFormatFlags.Right;
+                    else if (TextAlign == ContentAlignment.MiddleRight)
+                        flags = TextFormatFlags.VerticalCenter | TextFormatFlags.Left;
+                    else if (TextAlign == ContentAlignment.TopCenter)
+                        flags = TextFormatFlags.Top | TextFormatFlags.HorizontalCenter;
+                    else if (TextAlign == ContentAlignment.TopLeft)
+                        flags = TextFormatFlags.Top | TextFormatFlags.Right;
+                    else if (TextAlign == ContentAlignment.TopRight)
+                        flags = TextFormatFlags.Top | TextFormatFlags.Left;
+                    else
+                        flags = TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter;
+
+                    flags |= TextFormatFlags.RightToLeft;
                 }
 
-                if (DesignMode || !DesignMode)
-                {
-                    if (Parent != null)
-                        e.Graphics.Clear(Parent.BackColor);
+                TextRenderer.DrawText(e.Graphics, button.Text, button.Font, rect, foreColor, flags);
 
-                    Rectangle rect = new(e.ClipRectangle.X, e.ClipRectangle.Y, e.ClipRectangle.Width - 1, e.ClipRectangle.Height - 1);
-
-                    // Draw Button Background
-                    using SolidBrush sbBG = new(backColor);
-                    //e.Graphics.FillRectangle(sbBG, rect);
-                    e.Graphics.FillRoundedRectangle(sbBG, rect, RoundedCorners, RoundedCorners, RoundedCorners, RoundedCorners);
-
-                    // Draw Hover Button Background (// MousePosition Or Cursor.Position)
-                    if (button.PointToScreen(Point.Empty).X <= MousePosition.X
-                            && MousePosition.X <= (button.PointToScreen(Point.Empty).X + rect.Width)
-                            && button.PointToScreen(Point.Empty).Y <= MousePosition.Y
-                            && MousePosition.Y <= (button.PointToScreen(Point.Empty).Y + rect.Height))
-                    {
-                        if (ButtonMouseHover)
-                        {
-                            using SolidBrush sbHBG = new(mouseHoverColor);
-                            //e.Graphics.FillRectangle(sbHBG, rect);
-                            e.Graphics.FillRoundedRectangle(sbHBG, rect, RoundedCorners, RoundedCorners, RoundedCorners, RoundedCorners);
-
-                            if (ButtonMouseDown)
-                            {
-                                using SolidBrush sbDBG = new(mouseDownColor);
-                                //e.Graphics.FillRectangle(sbDBG, rect);
-                                e.Graphics.FillRoundedRectangle(sbDBG, rect, RoundedCorners, RoundedCorners, RoundedCorners, RoundedCorners);
-                            }
-                        }
-                    }
-
-                    if (button.Enabled && button.Focused)
-                    {
-                        rect.Inflate(-2, -2);
-                        using Pen pen = new(SelectionColor) { DashStyle = DashStyle.Dash };
-                        //if (RoundedCorners == 0)
-                        //    e.Graphics.DrawRectangle(pen, rect);
-                        //else
-                        e.Graphics.DrawRoundedRectangle(pen, rect, RoundedCorners, RoundedCorners, RoundedCorners, RoundedCorners);
-                        rect.Inflate(+2, +2);
-                    }
-
-                    // Draw Button Text
-                    TextFormatFlags flags = TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter;
-                    TextRenderer.DrawText(e.Graphics, button.Text, button.Font, rect, foreColor, flags);
-
-                    // Draw Button Border
-                    using Pen penb = new(borderColor);
-                    //e.Graphics.DrawRectangle(penb, rect);
-                    e.Graphics.DrawRoundedRectangle(penb, rect, RoundedCorners, RoundedCorners, RoundedCorners, RoundedCorners);
-                }
+                // Paint Button Border
+                using Pen penB = new(borderColor);
+                e.Graphics.DrawRoundedRectangle(penB, rect, RoundedCorners, RoundedCorners, RoundedCorners, RoundedCorners);
             }
         }
-    }
 
-    static class Extentions
-    {
-        public static void DrawRoundedRectangle(this Graphics graphics, Pen pen, Rectangle bounds, int radiusTopLeft, int radiusTopRight, int radiusBottomRight, int radiusBottomLeft)
+        private Color GetBackColor(Button button)
         {
-            GraphicsPath path;
-            path = RoundedRectangle(bounds, radiusTopLeft, radiusTopRight, radiusBottomRight, radiusBottomLeft);
-            graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            graphics.DrawPath(pen, path);
-            graphics.SmoothingMode = SmoothingMode.Default;
+            if (button.Enabled)
+                return BackColor;
+            else
+            {
+                if (BackColor.DarkOrLight() == "Dark")
+                    return BackColor.ChangeBrightness(0.3f);
+                else
+                    return BackColor.ChangeBrightness(-0.3f);
+            }
         }
 
-        public static void FillRoundedRectangle(this Graphics graphics, Brush brush, Rectangle bounds, int radiusTopLeft, int radiusTopRight, int radiusBottomRight, int radiusBottomLeft)
+        private Color GetForeColor()
         {
-            GraphicsPath path;
-            path = RoundedRectangle(bounds, radiusTopLeft, radiusTopRight, radiusBottomRight, radiusBottomLeft);
-            graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            graphics.FillPath(brush, path);
-            graphics.SmoothingMode = SmoothingMode.Default;
+            if (Enabled)
+                return ForeColor;
+            else
+            {
+                if (ForeColor.DarkOrLight() == "Dark")
+                    return ForeColor.ChangeBrightness(0.2f);
+                else
+                    return ForeColor.ChangeBrightness(-0.2f);
+            }
         }
 
-        private static GraphicsPath RoundedRectangle(Rectangle bounds, int radiusTopLeft, int radiusTopRight, int radiusBottomRight, int radiusBottomLeft)
+        private Color GetBorderColor()
         {
-            int diameterTopLeft = radiusTopLeft * 2;
-            int diameterTopRight = radiusTopRight * 2;
-            int diameterBottomRight = radiusBottomRight * 2;
-            int diameterBottomLeft = radiusBottomLeft * 2;
-
-            Rectangle arc1 = new(bounds.Location, new Size(diameterTopLeft, diameterTopLeft));
-            Rectangle arc2 = new(bounds.Location, new Size(diameterTopRight, diameterTopRight));
-            Rectangle arc3 = new(bounds.Location, new Size(diameterBottomRight, diameterBottomRight));
-            Rectangle arc4 = new(bounds.Location, new Size(diameterBottomLeft, diameterBottomLeft));
-            GraphicsPath path = new();
-
-            // Top Left Arc  
-            if (radiusTopLeft == 0)
-            {
-                path.AddLine(arc1.Location, arc1.Location);
-            }
+            if (Enabled)
+                return BorderColor;
             else
             {
-                path.AddArc(arc1, 180, 90);
+                if (BorderColor.DarkOrLight() == "Dark")
+                    return BorderColor.ChangeBrightness(0.3f);
+                else
+                    return BorderColor.ChangeBrightness(-0.3f);
             }
-            // Top Right Arc  
-            arc2.X = bounds.Right - diameterTopRight;
-            if (radiusTopRight == 0)
-            {
-                path.AddLine(arc2.Location, arc2.Location);
-            }
-            else
-            {
-                path.AddArc(arc2, 270, 90);
-            }
-            // Bottom Right Arc
-            arc3.X = bounds.Right - diameterBottomRight;
-            arc3.Y = bounds.Bottom - diameterBottomRight;
-            if (radiusBottomRight == 0)
-            {
-                path.AddLine(arc3.Location, arc3.Location);
-            }
-            else
-            {
-                path.AddArc(arc3, 0, 90);
-            }
-            // Bottom Left Arc 
-            arc4.X = bounds.Right - diameterBottomLeft;
-            arc4.Y = bounds.Bottom - diameterBottomLeft;
-            arc4.X = bounds.Left;
-            if (radiusBottomLeft == 0)
-            {
-                path.AddLine(arc4.Location, arc4.Location);
-            }
-            else
-            {
-                path.AddArc(arc4, 90, 90);
-            }
-            path.CloseFigure();
-            return path;
         }
     }
 }

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Text.RegularExpressions;	
 using System.Windows.Forms;
 
-namespace PersianSubtitleFixes.msmh
+namespace PersianSubtitleFixes.ColumnSorter
 {
 	/// <summary>
 	/// This class is an implementation of the 'IComparer' interface.

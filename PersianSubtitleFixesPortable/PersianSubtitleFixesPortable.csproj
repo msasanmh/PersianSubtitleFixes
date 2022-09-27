@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -13,7 +13,7 @@
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <ApplicationIcon>PersianSubtitleFixesIcon.ico</ApplicationIcon>
     <NoWin32Manifest>true</NoWin32Manifest>
-    <Version>$(VersionPrefix)1.0.2</Version>
+    <Version>$(VersionPrefix)1.0.3</Version>
   </PropertyGroup>
 
   <ItemGroup>

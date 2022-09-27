@@ -1,9 +1,10 @@
-﻿using System;
+﻿using MsmhTools;
+using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing.Drawing2D;
-using System.Text;
+using System.Runtime.InteropServices;
 using System.Windows.Forms.Design;
-using MsmhTools;
 /*
  * Copyright MSasanMH, April 16, 2022.
  */
@@ -20,41 +21,7 @@ namespace CustomControls
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public new ComboBoxStyle DropDownStyle { get; set; }
 
-        private Color mBackColor = Color.DimGray;
-        [EditorBrowsable(EditorBrowsableState.Always), Browsable(true)]
-        [Editor(typeof(WindowsFormsComponentEditor), typeof(Color))]
-        [Category("Appearance"), Description("Back Color")]
-        public override Color BackColor
-        {
-            get { return mBackColor; }
-            set
-            {
-                if (mBackColor != value)
-                {
-                    mBackColor = value;
-                    Invalidate();
-                }
-            }
-        }
-
-        private Color mForeColor = Color.White;
-        [EditorBrowsable(EditorBrowsableState.Always), Browsable(true)]
-        [Editor(typeof(WindowsFormsComponentEditor), typeof(Color))]
-        [Category("Appearance"), Description("Fore Color")]
-        public override Color ForeColor
-        {
-            get { return mForeColor; }
-            set
-            {
-                if (mForeColor != value)
-                {
-                    mForeColor = value;
-                    Invalidate();
-                }
-            }
-        }
-
-        private Color mBorderColor = Color.Red;
+        private Color mBorderColor = Color.Blue;
         [EditorBrowsable(EditorBrowsableState.Always), Browsable(true)]
         [Editor(typeof(WindowsFormsComponentEditor), typeof(Color))]
         [Category("Appearance"), Description("Border Color")]
@@ -71,7 +38,7 @@ namespace CustomControls
             }
         }
 
-        private Color mSelectionColor = Color.Blue;
+        private Color mSelectionColor = Color.DodgerBlue;
         [EditorBrowsable(EditorBrowsableState.Always), Browsable(true)]
         [Editor(typeof(WindowsFormsComponentEditor), typeof(Color))]
         [Category("Appearance"), Description("Selection Color")]
@@ -88,30 +55,46 @@ namespace CustomControls
             }
         }
 
-        private static Color[]? OriginalColors;
-        private static Color BackColorDarker { get; set; }
+        private string mText = string.Empty;
+        [EditorBrowsable(EditorBrowsableState.Always), Browsable(true)]
+        [Category("Appearance"), Description("Text")]
+        public override string Text
+        {
+            get { return mText; }
+            set
+            {
+                if (mText != value)
+                {
+                    mText = value;
+                    Invalidate();
+                }
+            }
+        }
 
-        private static Color BackColorDisabled;
-        private static Color ForeColorDisabled;
-        private static Color BorderColorDisabled;
-        private static Color BackColorDarkerDisabled;
-
-        private static readonly int MyPadding = 10;
-        private static bool ApplicationIdle = false;
+        private bool ApplicationIdle = false;
         private bool once = true;
 
         public CustomComboBox() : base()
         {
-            SetStyle(ControlStyles.OptimizedDoubleBuffer |
+            SetStyle(ControlStyles.AllPaintingInWmPaint |
+                     ControlStyles.OptimizedDoubleBuffer |
                      ControlStyles.ResizeRedraw |
                      ControlStyles.UserPaint, true);
+            SetStyle(ControlStyles.Opaque, true);
 
             DrawMode = DrawMode.OwnerDrawVariable;
 
+            // Default
+            BackColor = Color.DimGray;
+            ForeColor = Color.White;
+
             base.FlatStyle = FlatStyle.Flat;
             base.DropDownStyle = ComboBoxStyle.DropDownList;
+
             Application.Idle += Application_Idle;
             HandleCreated += CustomComboBox_HandleCreated;
+            BackColorChanged += CustomComboBox_BackColorChanged;
+            ForeColorChanged += CustomComboBox_ForeColorChanged;
             MouseMove += CustomComboBox_MouseMove;
             LocationChanged += CustomComboBox_LocationChanged;
             Move += CustomComboBox_Move;
@@ -121,16 +104,24 @@ namespace CustomControls
         private void Application_Idle(object? sender, EventArgs e)
         {
             ApplicationIdle = true;
-            if (Parent != null)
+            if (Parent != null && FindForm() != null)
             {
-                if (once == true)
+                if (once)
                 {
+                    Control topParent = FindForm();
+                    topParent.Move -= TopParent_Move;
+                    topParent.Move += TopParent_Move;
                     Parent.Move -= Parent_Move;
                     Parent.Move += Parent_Move;
                     Invalidate();
                     once = false;
                 }
             }
+        }
+
+        private void TopParent_Move(object? sender, EventArgs e)
+        {
+            Invalidate();
         }
 
         private void Parent_Move(object? sender, EventArgs e)
@@ -140,8 +131,16 @@ namespace CustomControls
 
         private void CustomComboBox_HandleCreated(object? sender, EventArgs e)
         {
-            BackColorDarker = mBackColor.ChangeBrightness(-0.3f);
-            OriginalColors = new Color[] { mBackColor, mForeColor, mBorderColor, mSelectionColor, BackColorDarker };
+            Invalidate();
+        }
+
+        private void CustomComboBox_BackColorChanged(object? sender, EventArgs e)
+        {
+            Invalidate();
+        }
+
+        private void CustomComboBox_ForeColorChanged(object? sender, EventArgs e)
+        {
             Invalidate();
         }
 
@@ -229,145 +228,85 @@ namespace CustomControls
             Invalidate();
         }
 
-        // Item's Box Border
-        //protected override void OnDropDown(EventArgs e)
-        //{
-        //    if (_buffer == null)
-        //        _buffer = new Bitmap(DropDownWidth, DropDownHeight);
-
-        //    using var g = Graphics.FromImage(_buffer);
-        //    // Draw DropDownList Border
-        //    Rectangle modRect2 = new(0, 10, DropDownWidth, DropDownHeight);
-        //    g.DrawRectangle(new Pen(Color.Red), modRect2);
-        //}
-
         protected override void OnPaint(PaintEventArgs e)
         {
-            // Update Colors
-            BackColorDarker = BackColor.ChangeBrightness(-0.3f);
-            OriginalColors = new Color[] { BackColor, ForeColor, BorderColor, SelectionColor, BackColorDarker };
-
-            if (ApplicationIdle == false)
+            if (!ApplicationIdle)
                 return;
 
-            if (DesignMode)
-            {
-                BackColor = mBackColor;
-                ForeColor = mForeColor;
-                BorderColor = mBorderColor;
-                SelectionColor = mSelectionColor;
-            }
-            else
-            {
-                if (OriginalColors != null)
-                {
-                    if (Enabled == true)
-                    {
-                        BackColor = OriginalColors[0];
-                        ForeColor = OriginalColors[1];
-                        BorderColor = OriginalColors[2];
-                        SelectionColor = OriginalColors[3];
-                        BackColorDarker = OriginalColors[4];
-                    }
-                    else
-                    {
-                        // Disabled Colors
-                        if (OriginalColors[0].DarkOrLight() == "Dark")
-                            BackColorDisabled = OriginalColors[0].ChangeBrightness(0.3f);
-                        else if (OriginalColors[0].DarkOrLight() == "Light")
-                            BackColorDisabled = OriginalColors[0].ChangeBrightness(-0.3f);
-
-                        if (OriginalColors[1].DarkOrLight() == "Dark")
-                            ForeColorDisabled = OriginalColors[1].ChangeBrightness(0.2f);
-                        else if (OriginalColors[1].DarkOrLight() == "Light")
-                            ForeColorDisabled = OriginalColors[1].ChangeBrightness(-0.2f);
-
-                        if (OriginalColors[2].DarkOrLight() == "Dark")
-                            BorderColorDisabled = OriginalColors[2].ChangeBrightness(0.3f);
-                        else if (OriginalColors[2].DarkOrLight() == "Light")
-                            BorderColorDisabled = OriginalColors[2].ChangeBrightness(-0.3f);
-
-                        if (OriginalColors[4].DarkOrLight() == "Dark")
-                            BackColorDarkerDisabled = OriginalColors[4].ChangeBrightness(0.3f);
-                        else if (OriginalColors[4].DarkOrLight() == "Light")
-                            BackColorDarkerDisabled = OriginalColors[4].ChangeBrightness(-0.3f);
-                    }
-                }
-            }
-
-            var g = e.Graphics;
-            Rectangle rect = new(0, 0, ClientSize.Width, ClientSize.Height);
-
-            Color backColor;
-            Color foreColor;
-            Color borderColor;
-            Color backColorDarker;
-
-            if (Enabled == true)
-            {
-                backColor = BackColor;
-                foreColor = ForeColor;
-                borderColor = BorderColor;
-                backColorDarker = BackColorDarker;
-            }
-            else
-            {
-                backColor = BackColorDisabled;
-                foreColor = ForeColorDisabled;
-                borderColor = BorderColorDisabled;
-                backColorDarker = BackColorDarkerDisabled;
-            }
+            Color backColor = GetBackColor();
+            Color foreColor = GetForeColor();
+            Color borderColor = GetBorderColor();
+            Color backColorDarker = backColor.ChangeBrightness(-0.3f);
 
             // Selected Border Color
             if (Focused && TabStop)
-                borderColor = BorderColor;
+                borderColor = GetBorderColor();
 
-            // Fill Background
+            // Rectangle
+            Rectangle rect = ClientRectangle;
+
+            // Mouse Position
+            Point mP = PointToClient(MousePosition);
+
+            // Paint Background
             using SolidBrush sb = new(backColor);
-            g.FillRectangle(sb, rect);
+            e.Graphics.FillRectangle(sb, rect);
 
-            // Draw Border
-            using Pen p = new(borderColor, 1);
-            Rectangle modRect1 = new(rect.Left, rect.Top, rect.Width - 1, rect.Height - 1);
-            if (DesignMode || !DesignMode)
+            // Button X, Y, Width, Height
+            int buttonX;
+            if (RightToLeft == RightToLeft.No)
+                buttonX = rect.Right - 15;
+            else
+                buttonX = rect.Left + 1;
+            int buttonY = rect.Top + 1;
+            int buttonWidth = 14;
+            int buttonHeight = rect.Height - 2;
+
+            // Button Rectangle
+            Rectangle rectButton = new(buttonX, buttonY, buttonWidth, buttonHeight);
+
+            // Paint Button
+            using SolidBrush buttonBrush = new(backColorDarker);
+            e.Graphics.FillRectangle(buttonBrush, rectButton);
+
+            // Paint MouseOver Button
+            if (Enabled && rectButton.Contains(mP))
             {
-                g.DrawRectangle(p, modRect1);
+                Color hoverColor = backColor.DarkOrLight() == "Dark" ? backColor.ChangeBrightness(0.3f) : backColor.ChangeBrightness(-0.3f);
+                using SolidBrush sbHover = new(hoverColor);
+                e.Graphics.FillRectangle(sbHover, rectButton);
             }
 
-            // Fill Arrow Button Back Color
-            using SolidBrush sb2 = new(backColorDarker);
-            int x = rect.Right - 15;
-            int y = rect.Top + 1;
-            int buttonWidth = rect.Width - x - 1;
-            int buttonHeight = rect.Height - 2;
-            Rectangle modRect2 = new(x, y, buttonWidth, buttonHeight);
-            g.FillRectangle(sb2, modRect2);
+            // Arrow Points
+            Point center = new(rectButton.X + rectButton.Width / 2, rectButton.Y + rectButton.Height / 2);
+            Point TopLeft = new(center.X - 3, center.Y - 1);
+            Point TopRight = new(center.X + 4, center.Y - 1);
+            Point Bottom = new(center.X, center.Y + 3);
+            Point[] arrowPoints = new Point[]
+            {
+                TopLeft, // Top Left
+                TopRight, // Top Right
+                Bottom // Bottom
+            };
 
-            // Draw Arrow Button Icon
-            var pth = new GraphicsPath();
-            var TopLeft = new PointF(x + buttonWidth * 1 / 5, y + buttonHeight * 2 / 5);
-            var TopRight = new PointF(x + buttonWidth * 4 / 5, y + buttonHeight * 2 / 5);
-            var Bottom = new PointF(x + buttonWidth / 2, y + buttonHeight * 3 / 5);
-            pth.AddLine(TopLeft, TopRight);
-            pth.AddLine(TopRight, Bottom);
-            // Determine the Arrow's Color.
+            // Paint Arrow
             using SolidBrush arrowBrush = new(foreColor);
-            // Draw the Arrow
-            g.SmoothingMode = SmoothingMode.AntiAlias;
-            g.FillPath(arrowBrush, pth);
-            g.SmoothingMode = SmoothingMode.Default;
+            e.Graphics.FillPolygon(arrowBrush, arrowPoints);
 
-            var text = SelectedItem != null ? SelectedItem.ToString() : Text;
+            // Text X, Y, Width, Height
+            int textX;
+            if (RightToLeft == RightToLeft.No)
+                textX = rect.Left + 1;
+            else
+                textX = rect.Left + buttonWidth + 1;
+            int textY = rect.Top;
+            int textWidth = rect.Width - buttonWidth - 2;
+            int textHeight = rect.Height;
 
-            using SolidBrush b = new(foreColor);
-            int padding = 2;
-            int arrowWidth = (int)(TopRight.X - TopLeft.X);
-            Rectangle modRect3 = new(rect.Left + padding,
-                                        rect.Top + padding,
-                                        rect.Width - arrowWidth - (MyPadding / 2) - (padding * 2),
-                                        rect.Height - (padding * 2));
+            // Text Rectangle
+            Rectangle rectText = new(textX, textY, textWidth, textHeight);
 
-            var stringFormat = new StringFormat
+            StringFormat stringFormat = new()
             {
                 LineAlignment = StringAlignment.Center,
                 Alignment = StringAlignment.Near,
@@ -375,7 +314,21 @@ namespace CustomControls
                 Trimming = StringTrimming.EllipsisCharacter
             };
 
-            g.DrawString(text, Font, b, modRect3, stringFormat);
+            // Paint Text
+            string text = SelectedItem != null ? SelectedItem.ToString() : Text;
+            using SolidBrush textBrush = new(foreColor);
+            e.Graphics.DrawString(text, Font, textBrush, rectText, stringFormat);
+
+            // Paint Border
+            ControlPaint.DrawBorder(e.Graphics, rect, borderColor, ButtonBorderStyle.Solid);
+
+            // ComboBox Height
+            Size textSize = TextRenderer.MeasureText(text, Font);
+            if (textSize.Height == 0)
+                ItemHeight = 17;
+            else
+                ItemHeight = textSize.Height + 2;
+            base.OnPaint(e);
         }
 
         protected override void OnDrawItem(DrawItemEventArgs e)
@@ -416,5 +369,45 @@ namespace CustomControls
                 g.DrawString(text, Font, b, modRect, stringFormat);
             }
         }
+
+        private Color GetBackColor()
+        {
+            if (Enabled)
+                return BackColor;
+            else
+            {
+                if (BackColor.DarkOrLight() == "Dark")
+                    return BackColor.ChangeBrightness(0.3f);
+                else
+                    return BackColor.ChangeBrightness(-0.3f);
+            }
+        }
+
+        private Color GetForeColor()
+        {
+            if (Enabled)
+                return ForeColor;
+            else
+            {
+                if (ForeColor.DarkOrLight() == "Dark")
+                    return ForeColor.ChangeBrightness(0.2f);
+                else
+                    return ForeColor.ChangeBrightness(-0.2f);
+            }
+        }
+
+        private Color GetBorderColor()
+        {
+            if (Enabled)
+                return BorderColor;
+            else
+            {
+                if (BorderColor.DarkOrLight() == "Dark")
+                    return BorderColor.ChangeBrightness(0.3f);
+                else
+                    return BorderColor.ChangeBrightness(-0.3f);
+            }
+        }
+
     }
 }

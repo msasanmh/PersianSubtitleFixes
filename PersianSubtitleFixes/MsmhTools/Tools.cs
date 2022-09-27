@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using PersianSubtitleFixes;
 using System.Security.Cryptography;
 using Force.Crc32;
 using System.Text.RegularExpressions;
@@ -20,11 +19,57 @@ using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using System.Xml.Linq;
 
 namespace MsmhTools
 {
+    public static class Methods
+    {
+        [DllImport("uxtheme.dll", CharSet = CharSet.Unicode)]
+        internal extern static int SetWindowTheme(IntPtr controlHandle, string appName, string? idList);
+    }
     public static class Extensions
     {
+        //-----------------------------------------------------------------------------------
+        public static string ToBase64String(this string text)
+        {
+            return Convert.ToBase64String(Encoding.UTF8.GetBytes(text));
+        }
+        //-----------------------------------------------------------------------------------
+        public static string FromBase64String(this string base64String)
+        {
+            return Encoding.UTF8.GetString(Convert.FromBase64String(base64String));
+        }
+        //-----------------------------------------------------------------------------------
+        public static string RemoveWhiteSpaces(this string text)
+        {
+            string findWhat = @"\s+";
+            return Regex.Replace(text, findWhat, "");
+        }
+        //-----------------------------------------------------------------------------------
+        public static void SetDarkControl(this Control control)
+        {
+            _ = Methods.SetWindowTheme(control.Handle, "DarkMode_Explorer", null);
+            foreach (Control c in Tools.Controllers.GetAllControls(control))
+            {
+                _ = Methods.SetWindowTheme(c.Handle, "DarkMode_Explorer", null);
+            }
+        }
+        //-----------------------------------------------------------------------------------
+        public static XmlDocument ToXmlDocument(this XDocument xDocument)
+        {
+            var xmlDocument = new XmlDocument();
+            using var xmlReader = xDocument.CreateReader();
+            xmlDocument.Load(xmlReader);
+            return xmlDocument;
+        }
+        //-----------------------------------------------------------------------------------
+        public static XDocument ToXDocument(this XmlDocument xmlDocument)
+        {
+            using var nodeReader = new XmlNodeReader(xmlDocument);
+            nodeReader.MoveToContent();
+            return XDocument.Load(nodeReader);
+        }
         //-----------------------------------------------------------------------------------
         public static string? AssemblyDescription(this Assembly assembly)
         {
@@ -114,6 +159,16 @@ namespace MsmhTools
             graphics.SmoothingMode = SmoothingMode.Default;
         }
         //-----------------------------------------------------------------------------------
+        public static void DrawCircle(this Graphics g, Pen pen, float centerX, float centerY, float radius)
+        {
+            g.DrawEllipse(pen, centerX - radius, centerY - radius, radius + radius, radius + radius);
+        }
+        //-----------------------------------------------------------------------------------
+        public static void FillCircle(this Graphics g, Brush brush, float centerX, float centerY, float radius)
+        {
+            g.FillEllipse(brush, centerX - radius, centerY - radius, radius + radius, radius + radius);
+        }
+        //-----------------------------------------------------------------------------------
         public static string ToXml(this DataSet ds)
         {
             using var memoryStream = new MemoryStream();
@@ -137,6 +192,7 @@ namespace MsmhTools
             return ds;
         }
         //-----------------------------------------------------------------------------------
+        //-----------------------------------------------------------------------------------
         public static void AddVScrollBar(this DataGridView dataGridView, CustomVScrollBar customVScrollBar)
         {
             customVScrollBar.Dock = DockStyle.Right;
@@ -144,9 +200,19 @@ namespace MsmhTools
             customVScrollBar.BringToFront();
             dataGridView.Controls.Add(customVScrollBar);
             dataGridView.ScrollBars = ScrollBars.None;
+            dataGridView.SelectionChanged += (object? sender, EventArgs e) =>
+            {
+                // To update ScrollBar position
+                customVScrollBar.Value = dataGridView.FirstDisplayedScrollingRowIndex;
+            };
             dataGridView.SizeChanged += (object? sender, EventArgs e) =>
             {
                 // To update LargeChange on form resize
+                customVScrollBar.LargeChange = dataGridView.DisplayedRowCount(false);
+            };
+            dataGridView.Invalidated += (object? sender, InvalidateEventArgs e) =>
+            {
+                // To update LargeChange on invalidation
                 customVScrollBar.LargeChange = dataGridView.DisplayedRowCount(false);
             };
             dataGridView.RowsAdded += (object? sender, DataGridViewRowsAddedEventArgs e) =>
@@ -162,6 +228,8 @@ namespace MsmhTools
                     if (dataGridView.Rows.Count > 0)
                     {
                         customVScrollBar.Value = e.NewValue;
+                        // To update LargeChange on scroll
+                        customVScrollBar.LargeChange = dataGridView.DisplayedRowCount(false);
                     }
                 }
             };
@@ -247,6 +315,34 @@ namespace MsmhTools
             }
         }
         //-----------------------------------------------------------------------------------
+        /// <summary>
+        /// Change Color Hue. (0f - 360f)
+        /// </summary>
+        /// <returns>
+        /// Returns Modified Color.
+        /// </returns>
+        public static Color ChangeHue(this Color color, float hue)
+        {
+            float hueO = color.GetHue();
+            float saturationO = color.GetSaturation();
+            float lightnessO = color.GetBrightness();
+            return Tools.Colors.FromHsl(255, hue, saturationO, lightnessO);
+        }
+        //-----------------------------------------------------------------------------------
+        /// <summary>
+        /// Change Color Saturation. (0f - 1f)
+        /// </summary>
+        /// <returns>
+        /// Returns Modified Color.
+        /// </returns>
+        public static Color ChangeSaturation(this Color color, float saturation)
+        {
+            float hueO = color.GetHue();
+            float saturationO = color.GetSaturation();
+            float lightnessO = color.GetBrightness();
+            return Tools.Colors.FromHsl(255, hueO, saturation, lightnessO);
+        }
+        //-----------------------------------------------------------------------------------
         public static void AutoSizeLastColumn(this ListView listView)
         {
             if (listView.Columns.Count > 1)
@@ -287,9 +383,25 @@ namespace MsmhTools
             }
         }
         //-----------------------------------------------------------------------------------
-        public static List<string> RemoveDuplicates(this List<string> list)
+        public static int GetIndex<T>(this List<T> list, T value)
         {
-            List<string> NoDuplicates = list.Distinct().ToList();
+            return list.FindIndex(a => a.Equals(value));
+            // If the item is not found, it will return -1
+        }
+        //-----------------------------------------------------------------------------------
+        public static void ChangeValue<T>(this List<T> list, T oldValue, T newValue)
+        {
+            list[list.GetIndex(oldValue)] = newValue;
+        }
+        //-----------------------------------------------------------------------------------
+        public static void RemoveValue<T>(this List<T> list, T value)
+        {
+            list.RemoveAt(list.GetIndex(value));
+        }
+        //-----------------------------------------------------------------------------------
+        public static List<T> RemoveDuplicates<T>(this List<T> list)
+        {
+            List<T> NoDuplicates = list.Distinct().ToList();
             return NoDuplicates;
         }
         //-----------------------------------------------------------------------------------
@@ -334,6 +446,7 @@ namespace MsmhTools
         {
             return Enumerable.SequenceEqual(list1, list2);
         }
+
         public static bool Compare(this string string1, string string2)
         {
             return string1.Equals(string2, StringComparison.Ordinal);
@@ -357,46 +470,222 @@ namespace MsmhTools
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     public static class Tools
     {
-        public static class Controllers
+        //=======================================================================================
+        public static class Colors
         {
             //-----------------------------------------------------------------------------------
-            //-----------------------------------------------------------------------------------
-            public static IEnumerable<Control> GetAllControls(Control control)
+            /// <summary>
+            /// Converts the HSL values to a Color.
+            /// </summary>
+            /// <param name="alpha">The alpha. (0 - 255)</param>
+            /// <param name="hue">The hue. (0f - 360f)</param>
+            /// <param name="saturation">The saturation. (0f - 1f)</param>
+            /// <param name="lighting">The lighting. (0f - 1f)</param>
+            /// <returns></returns>
+            public static Color FromHsl(int alpha, float hue, float saturation, float lighting)
             {
-                if (control == null)
-                    throw new ArgumentNullException(nameof(control));
-                return implementation();
-                IEnumerable<Control> implementation()
+                if (0 > alpha || 255 < alpha)
                 {
-                    foreach (Control control in control.Controls)
-                    {
-                        foreach (Control child in GetAllControls(control))
-                        {
-                            yield return child;
-                        }
-                        yield return control;
-                    }
+                    throw new ArgumentOutOfRangeException("alpha");
+                }
+                if (0f > hue || 360f < hue)
+                {
+                    throw new ArgumentOutOfRangeException("hue");
+                }
+                if (0f > saturation || 1f < saturation)
+                {
+                    throw new ArgumentOutOfRangeException("saturation");
+                }
+                if (0f > lighting || 1f < lighting)
+                {
+                    throw new ArgumentOutOfRangeException("lighting");
+                }
+
+                if (0 == saturation)
+                {
+                    return Color.FromArgb(alpha, Convert.ToInt32(lighting * 255), Convert.ToInt32(lighting * 255), Convert.ToInt32(lighting * 255));
+                }
+
+                float fMax, fMid, fMin;
+                int iSextant, iMax, iMid, iMin;
+
+                if (0.5 < lighting)
+                {
+                    fMax = lighting - (lighting * saturation) + saturation;
+                    fMin = lighting + (lighting * saturation) - saturation;
+                }
+                else
+                {
+                    fMax = lighting + (lighting * saturation);
+                    fMin = lighting - (lighting * saturation);
+                }
+
+                iSextant = (int)Math.Floor(hue / 60f);
+                if (300f <= hue)
+                {
+                    hue -= 360f;
+                }
+                hue /= 60f;
+                hue -= 2f * (float)Math.Floor(((iSextant + 1f) % 6f) / 2f);
+                if (0 == iSextant % 2)
+                {
+                    fMid = hue * (fMax - fMin) + fMin;
+                }
+                else
+                {
+                    fMid = fMin - hue * (fMax - fMin);
+                }
+
+                iMax = Convert.ToInt32(fMax * 255);
+                iMid = Convert.ToInt32(fMid * 255);
+                iMin = Convert.ToInt32(fMin * 255);
+
+                switch (iSextant)
+                {
+                    case 1:
+                        return Color.FromArgb(alpha, iMid, iMax, iMin);
+                    case 2:
+                        return Color.FromArgb(alpha, iMin, iMax, iMid);
+                    case 3:
+                        return Color.FromArgb(alpha, iMin, iMid, iMax);
+                    case 4:
+                        return Color.FromArgb(alpha, iMid, iMin, iMax);
+                    case 5:
+                        return Color.FromArgb(alpha, iMax, iMin, iMid);
+                    default:
+                        return Color.FromArgb(alpha, iMax, iMid, iMin);
                 }
             }
             //-----------------------------------------------------------------------------------
-            public static IEnumerable<Control> GetAllControlByType(Control control, Type type)
-            {
-                var controls = control.Controls.Cast<Control>().ToList();
-                return controls.SelectMany(ctrl => GetAllControlByType(ctrl, type))
-                                          .Concat(controls)
-                                          .Where(c => c.GetType() == type);
-            } // Usage: var c = GetAllControlByType(this, typeof(CustomButton))
+        }
+        //=======================================================================================
+        public static class Controllers
+        {
             //-----------------------------------------------------------------------------------
-            public static List<T> GetSubControls<T>(Control control)
+            public static List<Control> GetAllControls(Control control)
             {
+                List<Control> listC = new();
+                GetAllSubControlsByType(control);
+
+                void GetAllSubControlsByType(Control control)
+                {
+                    listC.Add(control);
+
+                    if (control.HasChildren)
+                    {
+                        for (int n = 0; n < control.Controls.Count; n++)
+                        {
+                            Control c = control.Controls[n];
+                            GetAllSubControlsByType(c);
+                        }
+                    }
+                }
+                return listC;
+            }
+            //-----------------------------------------------------------------------------------
+            public static List<Control> GetAllChildControls(Control control)
+            {
+                List<Control> listC = new();
+                GetAllSubControlsByType(control);
+
+                void GetAllSubControlsByType(Control control)
+                {
+                    if (control.HasChildren)
+                    {
+                        for (int n = 0; n < control.Controls.Count; n++)
+                        {
+                            Control c = control.Controls[n];
+                            listC.Add(c);
+                            GetAllSubControlsByType(c);
+                        }
+                    }
+                }
+                return listC;
+            }
+            //-----------------------------------------------------------------------------------
+            public static List<T> GetAllControlsByType<T>(Control control)
+            {
+                List<T> listT = new();
                 var type = control.GetType();
                 var fields = type.GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
-                var contextMenus = fields.Where(c => c.GetValue(control) != null &&
-                (c.GetValue(control).GetType().IsSubclassOf(typeof(T)) || c.GetValue(control).GetType() == typeof(T)));
-                var menus = contextMenus.Select(c => c.GetValue(control));
-                return menus.Cast<T>().ToList();
+                for (int n = 0; n < fields.Length; n++)
+                {
+                    var field = fields[n];
+                    if (field.GetValue(control) != null &&
+                        (field.GetValue(control).GetType().IsSubclassOf(typeof(T)) || field.GetValue(control).GetType() == typeof(T)))
+                    {
+                        var t = (T)field.GetValue(control);
+                        if (t != null)
+                            listT.Add(t);
+                    }
+                }
+                return listT;
             } // Usage: var toolStripButtons = GetSubControls<ToolStripDropButton>(form);
             //-----------------------------------------------------------------------------------
+            /// <summary>
+            /// Recursively get SubMenu Items. Includes Separators.
+            /// </summary>
+            /// <param name="item"></param>
+            /// <returns></returns>
+            public static IEnumerable<ToolStripItem?> GetAllToolStripItems(ToolStripItem? item)
+            {
+                if (item is ToolStripMenuItem)
+                {
+                    foreach (ToolStripItem tsi in (item as ToolStripMenuItem).DropDownItems)
+                    {
+                        if (tsi is ToolStripMenuItem)
+                        {
+                            if ((tsi as ToolStripMenuItem).HasDropDownItems)
+                            {
+                                foreach (ToolStripItem subItem in GetAllToolStripItems(tsi as ToolStripMenuItem))
+                                    yield return subItem;
+                            }
+                            yield return tsi as ToolStripMenuItem;
+                        }
+                        else if (tsi is ToolStripSeparator)
+                        {
+                            yield return tsi as ToolStripSeparator;
+                        }
+                    }
+                }
+                else if (item is ToolStripSeparator)
+                {
+                    yield return item as ToolStripSeparator;
+                }
+            }
+            // Usage:
+            // if(toolItem is ToolStripMenuItem)
+            // { 
+            //      ToolStripMenuItem tsmi = (toolItem as ToolStripMenuItem);
+            //      //Do something with it
+            // }
+            // else if(toolItem is ToolStripSeparator)
+            // {
+            //      ToolStripSeparator tss = (toolItem as ToolStripSeparator);
+            //      //Do something with it
+            // }
+            //-----------------------------------------------------------------------------------
+            public static Control GetTopParent(Control control)
+            {
+                Control parent = control;
+                if (control.Parent != null)
+                {
+                    parent = control.Parent;
+                    if (parent.Parent != null)
+                        while (parent.Parent != null)
+                            parent = parent.Parent;
+                }
+                return parent;
+            }
+            //-----------------------------------------------------------------------------------
+            public static void SetDarkControl(Control control)
+            {
+                _ = Methods.SetWindowTheme(control.Handle, "DarkMode_Explorer", null);
+                foreach (Control c in GetAllControls(control))
+                {
+                    _ = Methods.SetWindowTheme(c.Handle, "DarkMode_Explorer", null);
+                }
+            }
             //-----------------------------------------------------------------------------------
         }
         //=======================================================================================
@@ -719,6 +1008,11 @@ namespace MsmhTools
         public static class Xml
         {
             //-----------------------------------------------------------------------------------
+            public static XDocument RemoveEmptyElements(XDocument xDoc)
+            {
+                xDoc.Descendants().Where(a => a.IsEmpty && !a.HasAttributes && !a.HasElements && string.IsNullOrWhiteSpace(a.Value)).Remove();
+                return xDoc;
+            }
             //-----------------------------------------------------------------------------------
             public static void RemoveNodesWithoutChild(string xmlFile)
             {
@@ -1125,16 +1419,53 @@ namespace MsmhTools
                 }
             }
             //-----------------------------------------------------------------------------------
-            
+
             //-----------------------------------------------------------------------------------
         }
         //=======================================================================================
         public class Texts
         {
+            //-----------------------------------------------------------------------------------
+            public static string GetCRC32(string text)
+            {
+                var bytes = Encoding.UTF8.GetBytes(text);
+                uint crc32 = Crc32Algorithm.Compute(bytes);
+                return crc32.ToString();
+            }
+            //-----------------------------------------------------------------------------------
+            public static string GetSHA512(string text)
+            {
+                var bytes = Encoding.UTF8.GetBytes(text);
+                using var hash = SHA512.Create();
+                var hashedInputBytes = hash.ComputeHash(bytes);
+                // Convert to text
+                // StringBuilder Capacity is 128, because 512 bits / 8 bits in byte * 2 symbols for byte 
+                var hashedInputStringBuilder = new StringBuilder(128);
+                foreach (var b in hashedInputBytes)
+                    hashedInputStringBuilder.Append(b.ToString("X2"));
+                return hashedInputStringBuilder.ToString();
+            }
+            //-----------------------------------------------------------------------------------
             public static string? GetTextByLineNumber(string text, int lineNo)
             {
                 string[] lines = text.Replace("\r", "").Split('\n');
                 return lines.Length >= lineNo ? lines[lineNo - 1] : null;
+            }
+            //-----------------------------------------------------------------------------------
+            public static bool IsValidRegex(string pattern)
+            {
+                if (string.IsNullOrWhiteSpace(pattern)) return false;
+
+                try
+                {
+                    Regex.Match("", pattern);
+                }
+                catch (ArgumentException)
+                {
+                    return false;
+                }
+
+                return true;
             }
         }
         //=======================================================================================
@@ -1478,7 +1809,7 @@ namespace MsmhTools
             }
         }
         //=======================================================================================
-        
+
         //=======================================================================================
         public class CenterWinDialog : IDisposable
         {
@@ -1539,26 +1870,6 @@ namespace MsmhTools
         // {
         //      MessageBox.Show("MessageBox is Parent center.");
         // }
-        //=======================================================================================
-        public class TransparentLabel : Label
-        {
-            public TransparentLabel()
-            {
-                SetStyle(ControlStyles.Opaque, true);
-                SetStyle(ControlStyles.OptimizedDoubleBuffer, false);
-                SetStyle(ControlStyles.SupportsTransparentBackColor, true);
-                BackColor = Color.Transparent;
-            }
-            protected override CreateParams CreateParams
-            {
-                get
-                {
-                    CreateParams parms = base.CreateParams;
-                    parms.ExStyle |= 0x20;  // Turn on WS_EX_TRANSPARENT
-                    return parms;
-                }
-            }
-        } // Usage: Tools.TransparentLabel MyLabel = new();
         //=======================================================================================
     }
 }

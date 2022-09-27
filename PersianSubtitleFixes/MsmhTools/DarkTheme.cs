@@ -1,7 +1,10 @@
 ﻿using CustomControls;
 using Nikse.SubtitleEdit.Core.Common;
+using PSFTools;
+using System.Diagnostics;
 using System.Drawing.Drawing2D;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace MsmhTools
 {
@@ -11,6 +14,7 @@ namespace MsmhTools
         public static Color ForeColor { get; private set; }
         private static bool ButtonMouseHover { get; set; }
         private static bool ButtonMouseDown { get; set; }
+        private static readonly CustomToolStripRenderer customToolStripRenderer = new();
 
         private const int DWMWA_USE_IMMERSIVE_DARK_MODE_BEFORE_20H1 = 19;
         private const int DWMWA_USE_IMMERSIVE_DARK_MODE = 20;
@@ -40,15 +44,6 @@ namespace MsmhTools
             _ = NativeMethods.SetWindowTheme(control.Handle, "DarkMode_Explorer", null);
         }
 
-        public static IEnumerable<Control> GetAllControlByType(Control control, Type type)
-        {
-            var controls = control.Controls.Cast<Control>().ToList();
-
-            return controls.SelectMany(ctrl => GetAllControlByType(ctrl, type))
-                                      .Concat(controls)
-                                      .Where(c => c.GetType() == type);
-        }
-
         private static List<T> GetSubControls<T>(Control c)
         {
             var type = c.GetType();
@@ -69,6 +64,10 @@ namespace MsmhTools
 
             BackColor = Colors.BackColor;
             ForeColor = Colors.ForeColor;
+            customToolStripRenderer.BackColor = Colors.BackColor;
+            customToolStripRenderer.ForeColor = Colors.ForeColor;
+            customToolStripRenderer.BorderColor = Colors.Border;
+            customToolStripRenderer.SelectionColor = Colors.Selection;
 
             if (ctrl is Form form)
             {
@@ -79,21 +78,21 @@ namespace MsmhTools
                 {
                     cms.BackColor = BackColor;
                     cms.ForeColor = ForeColor;
-                    cms.Renderer = new MyRenderer();
+                    cms.Renderer = customToolStripRenderer;
                     foreach (Control inner in cms.Controls)
                     {
                         SetDarkTheme(inner, iterations - 1);
                     }
                 }
-
+                
                 var toolStrips = GetSubControls<ToolStrip>(form);
                 foreach (ToolStrip c in toolStrips)
                 {
                     c.BackColor = BackColor;
                     c.ForeColor = ForeColor;
-                    c.Renderer = new MyRenderer();
+                    c.Renderer = customToolStripRenderer;
                 }
-
+                
                 var toolStripComboBox = GetSubControls<ToolStripComboBox>(form);
                 foreach (ToolStripComboBox c in toolStripComboBox)
                 {
@@ -101,21 +100,21 @@ namespace MsmhTools
                     c.ForeColor = ForeColor;
                     c.FlatStyle = FlatStyle.Flat;
                 }
-
+                
                 var toolStripContentPanels = GetSubControls<ToolStripContentPanel>(form);
                 foreach (ToolStripContentPanel c in toolStripContentPanels)
                 {
                     c.BackColor = BackColor;
                     c.ForeColor = ForeColor;
                 }
-
+                
                 var toolStripContainers = GetSubControls<ToolStripContainer>(form);
                 foreach (ToolStripContainer c in toolStripContainers)
                 {
                     c.BackColor = BackColor;
                     c.ForeColor = ForeColor;
                 }
-
+                
                 var toolStripDropDownMenus = GetSubControls<ToolStripDropDownMenu>(form);
                 foreach (ToolStripDropDownMenu c in toolStripDropDownMenus)
                 {
@@ -127,14 +126,14 @@ namespace MsmhTools
                         x.ForeColor = ForeColor;
                     }
                 }
-
+                
                 var toolStripMenuItems = GetSubControls<ToolStripMenuItem>(form);
                 foreach (ToolStripMenuItem c in toolStripMenuItems)
                 {
                     if (c.GetCurrentParent() is ToolStripDropDownMenu p)
                     {
                         p.BackColor = BackColor;
-                        p.Renderer = new MyRenderer();
+                        p.Renderer = customToolStripRenderer;
                     }
 
                     c.BackColor = BackColor;
@@ -158,6 +157,9 @@ namespace MsmhTools
 
         private static void FixControl(Control c)
         {
+            if (c is TabPage)
+                return;
+
             c.BackColor = BackColor;
             c.ForeColor = ForeColor;
 
@@ -185,6 +187,9 @@ namespace MsmhTools
 
             if (c is RadioButton rb)
             {
+                if (c is CustomRadioButton)
+                    return;
+
                 rb.Paint += RadioButton_Paint;
             }
 
@@ -198,6 +203,9 @@ namespace MsmhTools
 
             if (c is NumericUpDown numeric)
             {
+                if (c is CustomNumericUpDown)
+                    return;
+
                 numeric.BorderStyle = BorderStyle.FixedSingle;
             }
 
@@ -228,7 +236,36 @@ namespace MsmhTools
 
             if (c is ContextMenuStrip cms)
             {
-                cms.Renderer = new MyRenderer();
+                if (c is CustomContextMenuStrip)
+                    return;
+
+                cms.Renderer = customToolStripRenderer;
+            }
+
+            if (c is ToolStripDropDownMenu t)
+            {
+                t.BackColor = BackColor;
+                t.ForeColor = ForeColor;
+                t.Renderer = customToolStripRenderer;
+                foreach (var x in t.Items)
+                {
+                    if (x is ToolStripMenuItem item)
+                    {
+                        item.BackColor = BackColor;
+                        item.ForeColor = ForeColor;
+                    }
+
+                    if (x is ToolStripDropDownItem dropDownMenu && dropDownMenu.DropDownItems.Count > 0)
+                    {
+                        dropDownMenu.BackColor = BackColor;
+                        dropDownMenu.ForeColor = ForeColor;
+                        foreach (ToolStripItem dropDownItem in dropDownMenu.DropDownItems)
+                        {
+                            dropDownItem.ForeColor = ForeColor;
+                            dropDownItem.BackColor = BackColor;
+                        }
+                    }
+                }
             }
 
             if (c is LinkLabel linkLabel)
@@ -240,18 +277,6 @@ namespace MsmhTools
                 linkLabel.DisabledLinkColor = Color.FromArgb(0, 70, 170);
             }
 
-            if (c is ToolStripDropDownMenu t)
-            {
-                foreach (var x in t.Items)
-                {
-                    if (x is ToolStripMenuItem item)
-                    {
-                        item.BackColor = BackColor;
-                        item.ForeColor = ForeColor;
-                    }
-                }
-            }
-
             if (c is TreeView || c is ListBox || c is TextBox || c is RichTextBox)
             {
                 SetWindowThemeDark(c);
@@ -259,6 +284,9 @@ namespace MsmhTools
 
             if (c is TabControl tc)
             {
+                if (c is CustomTabControl)
+                    return;
+
                 SetStyle(tc, ControlStyles.UserPaint | ControlStyles.DoubleBuffer, true);
                 tc.Paint += TabControl_Paint;
             }
@@ -481,22 +509,33 @@ namespace MsmhTools
                 // Draw Check
                 if (checkBox.Checked)
                 {
-                    // Draw Check Using Font
-                    //using SolidBrush brush3 = new(TickColor);
-                    //using Font wing = new("Wingdings", rectSize - 1);
-                    //e.Graphics.DrawString("ü", wing, brush3, x - 2, y);
+                    if (checkBox.CheckState == CheckState.Checked)
+                    {
+                        // Draw Check Using Font
+                        //using SolidBrush brush3 = new(TickColor);
+                        //using Font wing = new("Wingdings", rectSize - 1);
+                        //e.Graphics.DrawString("ü", wing, brush3, x - 2, y);
 
-                    // Draw Check
-                    using var p = new Pen(TickColor, 2);
-                    rectCheck.Inflate(-2, -2);
-                    e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-                    e.Graphics.DrawLines(p, new Point[] { new Point(rectCheck.Left, rectCheck.Bottom - rectCheck.Height / 2), new Point(rectCheck.Left + rectCheck.Width / 3, rectCheck.Bottom), new Point(rectCheck.Right, rectCheck.Top) });
-                    e.Graphics.SmoothingMode = SmoothingMode.Default;
-                    rectCheck.Inflate(+2, +2);
+                        // Draw Check
+                        using Pen p = new(TickColor, 2);
+                        rectCheck.Inflate(-2, -2);
+                        e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+                        e.Graphics.DrawLines(p, new Point[] { new Point(rectCheck.Left, rectCheck.Bottom - rectCheck.Height / 2), new Point(rectCheck.Left + rectCheck.Width / 3, rectCheck.Bottom), new Point(rectCheck.Right, rectCheck.Top) });
+                        e.Graphics.SmoothingMode = SmoothingMode.Default;
+                        rectCheck.Inflate(+2, +2);
+                    }
+                    else if (checkBox.CheckState == CheckState.Indeterminate)
+                    {
+                        // Draw Indeterminate
+                        using SolidBrush sb = new(TickColor);
+                        rectCheck.Inflate(-2, -2);
+                        e.Graphics.FillRectangle(sb, rectCheck);
+                        rectCheck.Inflate(+2, +2);
+                    }
                 }
 
                 // Draw Check Rect (Check Border)
-                e.Graphics.DrawRectangle(new Pen(BorderColor), rectCheck);
+                ControlPaint.DrawBorder(e.Graphics, rectCheck, BorderColor, ButtonBorderStyle.Solid);
             }
         }
         //==============================================================================
@@ -955,130 +994,6 @@ namespace MsmhTools
             e.Graphics.DrawRectangle(pen1, rectGv);
         }
         //==============================================================================
-        private class MyRenderer : ToolStripProfessionalRenderer
-        {
-            protected override void OnRenderSeparator(ToolStripSeparatorRenderEventArgs e)
-            {
-                if (e.Item as ToolStripSeparator == null)
-                    base.OnRenderSeparator(e);
-                else
-                {
-                    if (e.Vertical)
-                    {
-                        // Paint Vertical Separator
-                        Rectangle bounds = new(Point.Empty, e.Item.Size);
-                        bounds.Y += 3;
-                        bounds.Height = Math.Max(0, bounds.Height - 6);
-                        if (bounds.Height >= 4) bounds.Inflate(0, -2);
-                        Pen pen = new(Colors.ForeColor);
-                        int x = bounds.Width / 2;
-                        e.Graphics.DrawLine(pen, x, bounds.Top, x, bounds.Bottom - 1);
-                        pen.Dispose();
-                        pen = new(ControlPaint.Dark(Colors.ForeColor));
-                        e.Graphics.DrawLine(pen, x + 1, bounds.Top + 1, x + 1, bounds.Bottom);
-                        pen.Dispose();
-                    }
-                    else
-                    {
-                        // Paint Horizontal Separator
-                        Rectangle bounds = new(Point.Empty, e.Item.Size);
-                        Pen pen = new(Colors.ForeColor);
-                        int x = 25;
-                        int y = bounds.Height / 2;
-                        e.Graphics.DrawLine(pen, x, y, bounds.Right - 2, y);
-                        pen.Dispose();
-                        pen = new(ControlPaint.Dark(Colors.ForeColor));
-                        e.Graphics.DrawLine(pen, x +1, y + 1, bounds.Right - 1, y + 1);
-                        pen.Dispose();
-                    }
-                }
-            }
-
-            protected override void OnRenderToolStripBackground(ToolStripRenderEventArgs e)
-            {
-                using var brush = new SolidBrush(BackColor);
-                e.Graphics.FillRectangle(brush, e.ConnectedArea);
-            }
-
-            protected override void OnRenderToolStripBorder(ToolStripRenderEventArgs e)
-            {
-                if (e.ToolStrip is not ToolStrip)
-                {
-                    base.OnRenderToolStripBorder(e);
-                }
-            }
-
-            protected override void OnRenderImageMargin(ToolStripRenderEventArgs e)
-            {
-                var g = e.Graphics;
-                var rect = new Rectangle(0, 0, e.ToolStrip.Width - 1, e.ToolStrip.Height - 1);
-                using var p = new Pen(Color.FromArgb(81, 81, 81));
-                g.DrawRectangle(p, rect);
-            }
-
-            protected override void OnRenderItemCheck(ToolStripItemImageRenderEventArgs e)
-            {
-                var g = e.Graphics;
-                var rect = new Rectangle(e.ImageRectangle.Left - 2, e.ImageRectangle.Top - 2,
-                    e.ImageRectangle.Width + 4, e.ImageRectangle.Height + 4);
-
-                using (var b = new SolidBrush(Color.FromArgb(81, 81, 81)))
-                {
-                    g.FillRectangle(b, rect);
-                }
-
-                using (var p = new Pen(Color.FromArgb(104, 151, 187)))
-                {
-                    var modRect = new Rectangle(rect.Left, rect.Top, rect.Width - 1, rect.Height - 1);
-                    g.DrawRectangle(p, modRect);
-                }
-
-                if (e.Item.ImageIndex == -1 && string.IsNullOrEmpty(e.Item.ImageKey) && e.Item.Image == null)
-                {
-                    //g.DrawImageUnscaled(CustomControls.Icons.MenuIcons.tick, new Point(e.ImageRectangle.Left, e.ImageRectangle.Top));
-
-                    // Draw Check
-                    using var p = new Pen(Colors.Tick, 2);
-                    rect.Inflate(-2, -2);
-                    e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-                    e.Graphics.DrawLines(p, new Point[] { new Point(rect.Left, rect.Bottom - rect.Height / 2), new Point(rect.Left + rect.Width / 3, rect.Bottom), new Point(rect.Right, rect.Top) });
-                    e.Graphics.SmoothingMode = SmoothingMode.Default;
-                    rect.Inflate(+2, +2);
-                }
-            }
-
-            protected override void OnRenderMenuItemBackground(ToolStripItemRenderEventArgs e)
-            {
-                var g = e.Graphics;
-
-                e.Item.ForeColor = e.Item.Enabled ? Color.FromArgb(220, 220, 220) : Color.FromArgb(153, 153, 153);
-
-                if (e.Item.Enabled)
-                {
-
-                    var bgColor = e.Item.Selected ? Color.FromArgb(122, 128, 132) : e.Item.BackColor;
-
-                    // Normal item
-                    var rect = new Rectangle(2, 0, e.Item.Width - 3, e.Item.Height);
-
-                    using (var b = new SolidBrush(bgColor))
-                    {
-                        g.FillRectangle(b, rect);
-                    }
-
-                    // Header item on open menu
-                    if (e.Item.GetType() == typeof(ToolStripMenuItem))
-                    {
-                        if (((ToolStripMenuItem)e.Item).DropDown.Visible && e.Item.IsOnDropDown == false)
-                        {
-                            using var b = new SolidBrush(Color.FromArgb(92, 92, 92));
-                            g.FillRectangle(b, rect);
-                        }
-                    }
-                }
-            }
-        }
-
         /// <summary>
         /// A dark theme for TabControl.
         /// </summary>
@@ -1263,7 +1178,7 @@ namespace MsmhTools
 
                 var textColor = _enabled
                     ? ForeColor
-                    : SystemColors.GrayText;
+                    : Colors.ForeColorDisabled;
 
                 TextRenderer.DrawText(_graphics, _tabTexts[index], _font, textRect, textColor, format);
             }
@@ -1338,17 +1253,17 @@ namespace MsmhTools
             {
                 if (index == _selectedIndex)
                 {
-                    return new SolidBrush(_selectedTabColor);
+                    return new SolidBrush(Colors.Selection);
                 }
 
                 bool isHighlighted = _tabRects[index].Contains(_mouseCursor);
                 return isHighlighted
-                    ? new SolidBrush(_highlightedTabColor)
+                    ? new SolidBrush(Colors.SelectionUnfocused)
                     : new SolidBrush(BackColor);
             }
 
             private static Pen GetBorderPen() =>
-                new(SystemBrushes.ControlDark, BorderWidth);
+                new(Colors.Border, BorderWidth);
         }
 
         private static void SetStyle(Control control, ControlStyles styles, bool value) =>
@@ -1359,7 +1274,7 @@ namespace MsmhTools
         {
             item.BackColor = BackColor;
             item.ForeColor = ForeColor;
-
+            
             if (item is ToolStripDropDownItem dropDownMenu && dropDownMenu.DropDownItems.Count > 0)
             {
                 foreach (ToolStripItem dropDownItem in dropDownMenu.DropDownItems)
@@ -1368,28 +1283,7 @@ namespace MsmhTools
                     dropDownItem.BackColor = BackColor;
                 }
             }
-
-            if (item is ToolStripSeparator)
-            {
-                item.Paint += ToolStripSeparatorPaint;
-            }
         }
 
-        private static void ToolStripSeparatorPaint(object sender, PaintEventArgs e)
-        {
-            // Doesn't work (The default toolstrip renderer ignores the BackColor property and uses hard-coded colors.)
-            // Use OnRenderSeparator instead.
-            /*
-            var toolStripSeparator = (ToolStripSeparator)sender;
-            var width = toolStripSeparator.Width;
-            var height = toolStripSeparator.Height;
-            using (var backColorBrush = new SolidBrush(BackColor))
-            {
-                e.Graphics.FillRectangle(backColorBrush, 0, 0, width, height);
-            }
-            using var foreColorPen = new Pen(ForeColor);
-            e.Graphics.DrawLine(foreColorPen, 4, height / 2, width - 4, height / 2);
-            */
-        }
     }
 }

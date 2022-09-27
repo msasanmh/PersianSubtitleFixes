@@ -28,50 +28,69 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.LabelProduct = new System.Windows.Forms.Label();
-            this.LabelDetails = new System.Windows.Forms.Label();
-            this.LabelLib = new System.Windows.Forms.Label();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(About));
+            this.CustomLabelProduct = new CustomControls.CustomLabel();
+            this.CustomLabelDetails = new CustomControls.CustomLabel();
+            this.CustomLabelLib = new CustomControls.CustomLabel();
             this.LinkLabelLib = new System.Windows.Forms.LinkLabel();
             this.customPanel1 = new CustomControls.CustomPanel();
             this.PictureBoxLogo = new System.Windows.Forms.PictureBox();
             this.CustomButtonOK = new CustomControls.CustomButton();
             this.LinkLabelEmail = new System.Windows.Forms.LinkLabel();
-            this.LabelEmail = new System.Windows.Forms.Label();
+            this.CustomLabelEmail = new CustomControls.CustomLabel();
             this.LinkLabelHomePage = new System.Windows.Forms.LinkLabel();
-            this.LabelHomePage = new System.Windows.Forms.Label();
+            this.CustomLabelHomePage = new CustomControls.CustomLabel();
             this.LinkLabelIconSet = new System.Windows.Forms.LinkLabel();
-            this.LabelIconSet = new System.Windows.Forms.Label();
+            this.CustomLabelIconSet = new CustomControls.CustomLabel();
             this.customPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.PictureBoxLogo)).BeginInit();
             this.SuspendLayout();
             // 
-            // LabelProduct
+            // CustomLabelProduct
             // 
-            this.LabelProduct.AutoSize = true;
-            this.LabelProduct.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.LabelProduct.Location = new System.Drawing.Point(3, 0);
-            this.LabelProduct.Name = "LabelProduct";
-            this.LabelProduct.Size = new System.Drawing.Size(120, 21);
-            this.LabelProduct.TabIndex = 0;
-            this.LabelProduct.Text = "Product Name";
+            this.CustomLabelProduct.AutoSize = true;
+            this.CustomLabelProduct.BackColor = System.Drawing.Color.DimGray;
+            this.CustomLabelProduct.Border = false;
+            this.CustomLabelProduct.BorderColor = System.Drawing.Color.Blue;
+            this.CustomLabelProduct.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.CustomLabelProduct.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.CustomLabelProduct.ForeColor = System.Drawing.Color.White;
+            this.CustomLabelProduct.Location = new System.Drawing.Point(3, 0);
+            this.CustomLabelProduct.Name = "CustomLabelProduct";
+            this.CustomLabelProduct.RoundedCorners = 0;
+            this.CustomLabelProduct.Size = new System.Drawing.Size(122, 23);
+            this.CustomLabelProduct.TabIndex = 0;
+            this.CustomLabelProduct.Text = "Product Name";
             // 
-            // LabelDetails
+            // CustomLabelDetails
             // 
-            this.LabelDetails.AutoSize = true;
-            this.LabelDetails.Location = new System.Drawing.Point(5, 35);
-            this.LabelDetails.Name = "LabelDetails";
-            this.LabelDetails.Size = new System.Drawing.Size(87, 15);
-            this.LabelDetails.TabIndex = 1;
-            this.LabelDetails.Text = "Product Details";
+            this.CustomLabelDetails.AutoSize = true;
+            this.CustomLabelDetails.BackColor = System.Drawing.Color.DimGray;
+            this.CustomLabelDetails.Border = false;
+            this.CustomLabelDetails.BorderColor = System.Drawing.Color.Blue;
+            this.CustomLabelDetails.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.CustomLabelDetails.ForeColor = System.Drawing.Color.White;
+            this.CustomLabelDetails.Location = new System.Drawing.Point(5, 35);
+            this.CustomLabelDetails.Name = "CustomLabelDetails";
+            this.CustomLabelDetails.RoundedCorners = 0;
+            this.CustomLabelDetails.Size = new System.Drawing.Size(89, 17);
+            this.CustomLabelDetails.TabIndex = 1;
+            this.CustomLabelDetails.Text = "Product Details";
             // 
-            // LabelLib
+            // CustomLabelLib
             // 
-            this.LabelLib.AutoSize = true;
-            this.LabelLib.Location = new System.Drawing.Point(5, 105);
-            this.LabelLib.Name = "LabelLib";
-            this.LabelLib.Size = new System.Drawing.Size(86, 15);
-            this.LabelLib.TabIndex = 2;
-            this.LabelLib.Text = "Subtitle Library";
+            this.CustomLabelLib.AutoSize = true;
+            this.CustomLabelLib.BackColor = System.Drawing.Color.DimGray;
+            this.CustomLabelLib.Border = false;
+            this.CustomLabelLib.BorderColor = System.Drawing.Color.Blue;
+            this.CustomLabelLib.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.CustomLabelLib.ForeColor = System.Drawing.Color.White;
+            this.CustomLabelLib.Location = new System.Drawing.Point(5, 105);
+            this.CustomLabelLib.Name = "CustomLabelLib";
+            this.CustomLabelLib.RoundedCorners = 0;
+            this.CustomLabelLib.Size = new System.Drawing.Size(88, 17);
+            this.CustomLabelLib.TabIndex = 2;
+            this.CustomLabelLib.Text = "Subtitle Library";
             // 
             // LinkLabelLib
             // 
@@ -88,18 +107,18 @@
             this.customPanel1.Border = System.Windows.Forms.BorderStyle.None;
             this.customPanel1.BorderColor = System.Drawing.Color.Red;
             this.customPanel1.ButtonBorderStyle = System.Windows.Forms.ButtonBorderStyle.Solid;
-            this.customPanel1.Controls.Add(this.PictureBoxLogo);
-            this.customPanel1.Controls.Add(this.CustomButtonOK);
-            this.customPanel1.Controls.Add(this.LinkLabelEmail);
-            this.customPanel1.Controls.Add(this.LabelEmail);
-            this.customPanel1.Controls.Add(this.LinkLabelHomePage);
-            this.customPanel1.Controls.Add(this.LabelHomePage);
-            this.customPanel1.Controls.Add(this.LinkLabelIconSet);
-            this.customPanel1.Controls.Add(this.LabelIconSet);
+            this.customPanel1.Controls.Add(this.CustomLabelProduct);
+            this.customPanel1.Controls.Add(this.CustomLabelDetails);
+            this.customPanel1.Controls.Add(this.CustomLabelLib);
             this.customPanel1.Controls.Add(this.LinkLabelLib);
-            this.customPanel1.Controls.Add(this.LabelLib);
-            this.customPanel1.Controls.Add(this.LabelDetails);
-            this.customPanel1.Controls.Add(this.LabelProduct);
+            this.customPanel1.Controls.Add(this.CustomLabelIconSet);
+            this.customPanel1.Controls.Add(this.LinkLabelIconSet);
+            this.customPanel1.Controls.Add(this.CustomLabelHomePage);
+            this.customPanel1.Controls.Add(this.LinkLabelHomePage);
+            this.customPanel1.Controls.Add(this.CustomLabelEmail);
+            this.customPanel1.Controls.Add(this.LinkLabelEmail);
+            this.customPanel1.Controls.Add(this.CustomButtonOK);
+            this.customPanel1.Controls.Add(this.PictureBoxLogo);
             this.customPanel1.Location = new System.Drawing.Point(12, 12);
             this.customPanel1.Name = "customPanel1";
             this.customPanel1.Size = new System.Drawing.Size(400, 237);
@@ -118,12 +137,12 @@
             // 
             // CustomButtonOK
             // 
-            this.CustomButtonOK.BorderColor = System.Drawing.Color.Red;
+            this.CustomButtonOK.BorderColor = System.Drawing.Color.Blue;
             this.CustomButtonOK.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.CustomButtonOK.Location = new System.Drawing.Point(322, 211);
             this.CustomButtonOK.Name = "CustomButtonOK";
             this.CustomButtonOK.RoundedCorners = 0;
-            this.CustomButtonOK.SelectionColor = System.Drawing.Color.Blue;
+            this.CustomButtonOK.SelectionColor = System.Drawing.Color.LightBlue;
             this.CustomButtonOK.Size = new System.Drawing.Size(75, 23);
             this.CustomButtonOK.TabIndex = 10;
             this.CustomButtonOK.Text = "OK";
@@ -140,14 +159,21 @@
             this.LinkLabelEmail.TabStop = true;
             this.LinkLabelEmail.Text = "LinkLabelEmail";
             // 
-            // LabelEmail
+            // CustomLabelEmail
             // 
-            this.LabelEmail.AutoSize = true;
-            this.LabelEmail.Location = new System.Drawing.Point(5, 155);
-            this.LabelEmail.Name = "LabelEmail";
-            this.LabelEmail.Size = new System.Drawing.Size(36, 15);
-            this.LabelEmail.TabIndex = 8;
-            this.LabelEmail.Text = "Email";
+            this.CustomLabelEmail.AutoSize = true;
+            this.CustomLabelEmail.BackColor = System.Drawing.Color.DimGray;
+            this.CustomLabelEmail.Border = false;
+            this.CustomLabelEmail.BorderColor = System.Drawing.Color.Blue;
+            this.CustomLabelEmail.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.CustomLabelEmail.ForeColor = System.Drawing.Color.White;
+            this.CustomLabelEmail.Location = new System.Drawing.Point(5, 155);
+            this.CustomLabelEmail.Name = "CustomLabelEmail";
+            this.CustomLabelEmail.RoundedCorners = 0;
+            this.CustomLabelEmail.Size = new System.Drawing.Size(38, 17);
+            this.CustomLabelEmail.TabIndex = 8;
+            this.CustomLabelEmail.Text = "Email";
+            this.CustomLabelEmail.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // LinkLabelHomePage
             // 
@@ -159,14 +185,20 @@
             this.LinkLabelHomePage.TabStop = true;
             this.LinkLabelHomePage.Text = "LinkLabelHomePage";
             // 
-            // LabelHomePage
+            // CustomLabelHomePage
             // 
-            this.LabelHomePage.AutoSize = true;
-            this.LabelHomePage.Location = new System.Drawing.Point(5, 80);
-            this.LabelHomePage.Name = "LabelHomePage";
-            this.LabelHomePage.Size = new System.Drawing.Size(66, 15);
-            this.LabelHomePage.TabIndex = 6;
-            this.LabelHomePage.Text = "HomePage";
+            this.CustomLabelHomePage.AutoSize = true;
+            this.CustomLabelHomePage.BackColor = System.Drawing.Color.DimGray;
+            this.CustomLabelHomePage.Border = false;
+            this.CustomLabelHomePage.BorderColor = System.Drawing.Color.Blue;
+            this.CustomLabelHomePage.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.CustomLabelHomePage.ForeColor = System.Drawing.Color.White;
+            this.CustomLabelHomePage.Location = new System.Drawing.Point(5, 80);
+            this.CustomLabelHomePage.Name = "CustomLabelHomePage";
+            this.CustomLabelHomePage.RoundedCorners = 0;
+            this.CustomLabelHomePage.Size = new System.Drawing.Size(68, 17);
+            this.CustomLabelHomePage.TabIndex = 6;
+            this.CustomLabelHomePage.Text = "HomePage";
             // 
             // LinkLabelIconSet
             // 
@@ -178,22 +210,30 @@
             this.LinkLabelIconSet.TabStop = true;
             this.LinkLabelIconSet.Text = "LinkLabelIconSet";
             // 
-            // LabelIconSet
+            // CustomLabelIconSet
             // 
-            this.LabelIconSet.AutoSize = true;
-            this.LabelIconSet.Location = new System.Drawing.Point(5, 130);
-            this.LabelIconSet.Name = "LabelIconSet";
-            this.LabelIconSet.Size = new System.Drawing.Size(46, 15);
-            this.LabelIconSet.TabIndex = 4;
-            this.LabelIconSet.Text = "IconSet";
+            this.CustomLabelIconSet.AutoSize = true;
+            this.CustomLabelIconSet.BackColor = System.Drawing.Color.DimGray;
+            this.CustomLabelIconSet.Border = false;
+            this.CustomLabelIconSet.BorderColor = System.Drawing.Color.Blue;
+            this.CustomLabelIconSet.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.CustomLabelIconSet.ForeColor = System.Drawing.Color.White;
+            this.CustomLabelIconSet.Location = new System.Drawing.Point(5, 130);
+            this.CustomLabelIconSet.Name = "CustomLabelIconSet";
+            this.CustomLabelIconSet.RoundedCorners = 0;
+            this.CustomLabelIconSet.Size = new System.Drawing.Size(48, 17);
+            this.CustomLabelIconSet.TabIndex = 4;
+            this.CustomLabelIconSet.Text = "IconSet";
             // 
             // About
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.ControlDark;
             this.ClientSize = new System.Drawing.Size(424, 261);
             this.Controls.Add(this.customPanel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "About";
@@ -209,17 +249,17 @@
         }
 
         #endregion
-        private Label LabelProduct;
-        private Label LabelDetails;
-        private Label LabelLib;
+        private CustomControls.CustomLabel CustomLabelProduct;
+        private CustomControls.CustomLabel CustomLabelDetails;
+        private CustomControls.CustomLabel CustomLabelLib;
         private LinkLabel LinkLabelLib;
         private CustomControls.CustomPanel customPanel1;
         private LinkLabel LinkLabelIconSet;
-        private Label LabelIconSet;
+        private CustomControls.CustomLabel CustomLabelIconSet;
         private LinkLabel LinkLabelHomePage;
-        private Label LabelHomePage;
+        private CustomControls.CustomLabel CustomLabelHomePage;
         private LinkLabel LinkLabelEmail;
-        private Label LabelEmail;
+        private CustomControls.CustomLabel CustomLabelEmail;
         private CustomControls.CustomButton CustomButtonOK;
         private PictureBox PictureBoxLogo;
     }

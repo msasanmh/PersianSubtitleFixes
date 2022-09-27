@@ -6,7 +6,6 @@ C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\Persian
 C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\PersianSubtitleFixes\bin\Release\net6.0-windows\Crc32.NET.dll
 C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\PersianSubtitleFixes\bin\Release\net6.0-windows\libse.dll
 C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\PersianSubtitleFixes\bin\Release\net6.0-windows\UtfUnknown.dll
-C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\PersianSubtitleFixes\obj\Release\net6.0-windows\PersianSubtitleFixes.csproj.AssemblyReference.cache
 C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\PersianSubtitleFixes\obj\Release\net6.0-windows\CustomControls.CustomMessageBox.resources
 C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\PersianSubtitleFixes\obj\Release\net6.0-windows\CustomControls.CustomVScrollBar.resources
 C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\PersianSubtitleFixes\obj\Release\net6.0-windows\PersianSubtitleFixes.About.resources
@@ -22,3 +21,9 @@ C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\Persian
 C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\PersianSubtitleFixes\obj\Release\net6.0-windows\PersianSubtitleFixes.dll
 C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\PersianSubtitleFixes\obj\Release\net6.0-windows\ref\PersianSubtitleFixes.dll
 C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\PersianSubtitleFixes\obj\Release\net6.0-windows\PersianSubtitleFixes.genruntimeconfig.cache
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\PersianSubtitleFixes\obj\Release\net6.0-windows\CustomControls.CustomInputBox.resources
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\PersianSubtitleFixes\obj\Release\net6.0-windows\CustomControls.CustomTextBox.resources
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\PersianSubtitleFixes\obj\Release\net6.0-windows\CustomControls.CustomTimeUpDown.resources
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\PersianSubtitleFixes\obj\Release\net6.0-windows\PersianSubtitleFixes.MultipleReplace.resources
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\PersianSubtitleFixes\obj\Release\net6.0-windows\PersianSubtitleFixes.Guide.ResourceGuide.resources
+C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\PersianSubtitleFixes\obj\Release\net6.0-windows\PersianSubtitleFixes.csproj.AssemblyReference.cache

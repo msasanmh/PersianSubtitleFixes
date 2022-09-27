@@ -1,9 +1,9 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Text;
 using System.Windows.Forms.Design;
 /*
  * Copyright MSasanMH, April 16, 2022.
+ * Needs CustomComboBox.
  */
 
 namespace CustomControls
@@ -50,7 +50,7 @@ namespace CustomControls
             }
         }
 
-        private Color mBorderColor = Color.Red;
+        private Color mBorderColor = Color.Blue;
         [EditorBrowsable(EditorBrowsableState.Always), Browsable(true)]
         [Editor(typeof(WindowsFormsComponentEditor), typeof(Color))]
         [Category("Appearance"), Description("Border Color")]
@@ -68,7 +68,7 @@ namespace CustomControls
             }
         }
 
-        private Color mSelectionColor = Color.Blue;
+        private Color mSelectionColor = Color.LightBlue;
         [EditorBrowsable(EditorBrowsableState.Always), Browsable(true)]
         [Editor(typeof(WindowsFormsComponentEditor), typeof(Color))]
         [Category("Appearance"), Description("Selection Color")]
@@ -86,59 +86,46 @@ namespace CustomControls
             }
         }
 
-        private bool once = true;
+        public event EventHandler? DropDown;
+        public event EventHandler? DropDownClosed;
+        public event EventHandler? SelectionIndexChanged;
 
         public CustomToolStripComboBox() : base(new CustomComboBox())
         {
-            Application.Idle += Application_Idle;
             ComboBox.DropDown += new EventHandler(ComboBox_DropDown);
             ComboBox.DropDownClosed += new EventHandler(ComboBox_DropDownClosed);
             ComboBox.SelectedIndexChanged += new EventHandler(ComboBox_SelectedIndexChanged);
+            Paint += CustomToolStripComboBox_Paint;
         }
 
-        private void Application_Idle(object? sender, EventArgs e)
+        private void CustomToolStripComboBox_Paint(object? sender, PaintEventArgs e)
         {
             ComboBox.BackColor = BackColor;
             ComboBox.ForeColor = ForeColor;
             ComboBox.BorderColor = BorderColor;
             ComboBox.SelectionColor = SelectionColor;
-            if (Parent != null)
-            {
-                if (once == true)
-                {
-                    Parent.Move -= Parent_Move;
-                    Parent.Move += Parent_Move;
-                    Invalidate();
-                    once = false;
-                }
-            }
         }
 
-        private void Parent_Move(object? sender, EventArgs e)
+        private void ComboBox_DropDown(object? sender, EventArgs e)
         {
-            Invalidate();
+            DropDown?.Invoke(sender, e);
         }
 
-        void ComboBox_SelectedIndexChanged(object? sender, EventArgs e)
+        private void ComboBox_DropDownClosed(object? sender, EventArgs e)
         {
-            //if (CustomToolStripComboBox_SelectionIndexChanged != null)
-            //    CustomToolStripComboBox_SelectionIndexChanged(sender, e);
-            // Or
-            CustomToolStripComboBox_SelectionIndexChanged?.Invoke(sender, e);
+            DropDownClosed?.Invoke(sender, e);
         }
-        void ComboBox_DropDownClosed(object? sender, EventArgs e)
+
+        private void ComboBox_SelectedIndexChanged(object? sender, EventArgs e)
         {
-            CustomToolStripComboBox_DropDownClosed?.Invoke(sender, e);
+            SelectionIndexChanged?.Invoke(sender, e);
         }
-        void ComboBox_DropDown(object? sender, EventArgs e)
+
+        public CustomComboBox ComboBox
         {
-            CustomToolStripComboBox_DropDown?.Invoke(sender, e);
+            get { return (CustomComboBox)Control; }
         }
-        
-        public event EventHandler CustomToolStripComboBox_DropDown;
-        public event EventHandler CustomToolStripComboBox_DropDownClosed;
-        public event EventHandler CustomToolStripComboBox_SelectionIndexChanged;
-        
+
         public ComboBox.ObjectCollection Items
         {
             get
@@ -147,10 +134,7 @@ namespace CustomControls
                 return ccb.Items;
             }
         }
-        public CustomComboBox ComboBox
-        {
-            get { return (CustomComboBox)Control; }
-        }
+
         public AutoCompleteSource AutoCompleteSource
         {
             get
@@ -164,6 +148,7 @@ namespace CustomControls
                 ccb.AutoCompleteSource = value;
             }
         }
+
         public AutoCompleteMode AutoCompleteMode
         {
             get
@@ -177,6 +162,7 @@ namespace CustomControls
                 ccb.AutoCompleteMode = value;
             }
         }
+
         public AutoCompleteStringCollection AutoCompleteCustomSource
         {
             get
@@ -190,6 +176,7 @@ namespace CustomControls
                 ccb.AutoCompleteCustomSource = value;
             }
         }
+
         public int DropDownHeight
         {
             get
@@ -203,6 +190,7 @@ namespace CustomControls
                 ccb.DropDownHeight = value;
             }
         }
+
         public ComboBoxStyle DropDownStyle
         {
             get
@@ -216,6 +204,7 @@ namespace CustomControls
                 ccb.DropDownStyle = value;
             }
         }
+
         public int DropDownWidth
         {
             get
@@ -229,6 +218,7 @@ namespace CustomControls
                 ccb.DropDownWidth = value;
             }
         }
+
         public FlatStyle FlatStyle
         {
             get
@@ -242,6 +232,7 @@ namespace CustomControls
                 ccb.FlatStyle = value;
             }
         }
+
         public bool IntegralHeight
         {
             get
@@ -255,6 +246,7 @@ namespace CustomControls
                 ccb.IntegralHeight = value;
             }
         }
+
         public int MaxDropDownItems
         {
             get
@@ -268,6 +260,7 @@ namespace CustomControls
                 ccb.MaxDropDownItems = value;
             }
         }
+
         public int SelectedIndex
         {
             get
@@ -295,6 +288,7 @@ namespace CustomControls
                 ccb.SelectedItem = value;
             }
         }
+
         public string SelectedText
         {
             get
@@ -308,6 +302,7 @@ namespace CustomControls
                 ccb.SelectedText = value;
             }
         }
+
         public int SelectionLength
         {
             get
@@ -321,6 +316,7 @@ namespace CustomControls
                 ccb.SelectionLength = value;
             }
         }
+
         public int SelectionStart
         {
             get
@@ -334,6 +330,7 @@ namespace CustomControls
                 ccb.SelectionStart = value;
             }
         }
+
         public bool Sorted
         {
             get
