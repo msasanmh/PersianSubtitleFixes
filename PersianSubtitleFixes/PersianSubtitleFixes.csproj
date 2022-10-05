@@ -10,14 +10,14 @@
     <SignAssembly>False</SignAssembly>
     <Copyright>MSasanMH</Copyright>
     <AssemblyVersion>1.1</AssemblyVersion>
-    <FileVersion>1.0.3</FileVersion>
+    <FileVersion>1.0.4</FileVersion>
     <Product>Persian Subtitle Fixes</Product>
     <NeutralLanguage>en</NeutralLanguage>
     <DebugType>embedded</DebugType>
     <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
     <IsPublishable>True</IsPublishable>
     <ApplicationIcon>Icons\PersianSubtitleFixesIcon.ico</ApplicationIcon>
-    <Version>$(VersionPrefix)1.0.3</Version>
+    <Version>$(VersionPrefix)1.0.4</Version>
     <PackageLicenseFile>C:\Users\MSMH\Documents\Visual Studio 2022\Projects\PersianSubtitleFixes\LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
 
@@ -54,7 +54,6 @@
     <None Remove="Library\Newtonsoft.Json.dll" />
     <None Remove="Library\ObjectListView.dll" />
     <None Remove="Library\UtfUnknown.dll" />
-    <None Remove="ReplaceList\multiple_replace.xml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -67,7 +66,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Library\libse.dll" />
     <EmbeddedResource Include="Library\UtfUnknown.dll" />
-    <EmbeddedResource Include="ReplaceList\multiple_replace.xml" />
   </ItemGroup>
 
   <ItemGroup>

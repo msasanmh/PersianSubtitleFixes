@@ -63,8 +63,10 @@
             this.ColumnSearchType = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColumnDescription = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.CustomGroupBoxPreview = new CustomControls.CustomGroupBox();
-            this.CustomPanelAppliedRegex = new CustomControls.CustomPanel();
-            this.LabelAppliedRegex = new System.Windows.Forms.Label();
+            this.CustomTabControlAppliedRules = new CustomControls.CustomTabControl();
+            this.TabPageAppliedN = new System.Windows.Forms.TabPage();
+            this.TabPageAppliedCS = new System.Windows.Forms.TabPage();
+            this.TabPageAppliedR = new System.Windows.Forms.TabPage();
             this.CustomDataGridViewPreview = new CustomControls.CustomDataGridView();
             this.ColumnLine = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColumnBefore = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -84,7 +86,7 @@
             this.CustomGroupBoxRules.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.CustomDataGridViewRules)).BeginInit();
             this.CustomGroupBoxPreview.SuspendLayout();
-            this.CustomPanelAppliedRegex.SuspendLayout();
+            this.CustomTabControlAppliedRules.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.CustomDataGridViewPreview)).BeginInit();
             this.SuspendLayout();
             // 
@@ -615,7 +617,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.CustomGroupBoxPreview.BorderColor = System.Drawing.Color.Blue;
-            this.CustomGroupBoxPreview.Controls.Add(this.CustomPanelAppliedRegex);
+            this.CustomGroupBoxPreview.Controls.Add(this.CustomTabControlAppliedRules);
             this.CustomGroupBoxPreview.Controls.Add(this.CustomDataGridViewPreview);
             this.CustomGroupBoxPreview.Location = new System.Drawing.Point(1, 0);
             this.CustomGroupBoxPreview.Margin = new System.Windows.Forms.Padding(1);
@@ -626,30 +628,55 @@
             this.CustomGroupBoxPreview.TabStop = false;
             this.CustomGroupBoxPreview.Text = "Preview";
             // 
-            // CustomPanelAppliedRegex
+            // CustomTabControlAppliedRules
             // 
-            this.CustomPanelAppliedRegex.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.CustomTabControlAppliedRules.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.CustomPanelAppliedRegex.Border = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.CustomPanelAppliedRegex.BorderColor = System.Drawing.Color.Blue;
-            this.CustomPanelAppliedRegex.ButtonBorderStyle = System.Windows.Forms.ButtonBorderStyle.Solid;
-            this.CustomPanelAppliedRegex.Controls.Add(this.LabelAppliedRegex);
-            this.CustomPanelAppliedRegex.Location = new System.Drawing.Point(950, 19);
-            this.CustomPanelAppliedRegex.Margin = new System.Windows.Forms.Padding(1);
-            this.CustomPanelAppliedRegex.Name = "CustomPanelAppliedRegex";
-            this.CustomPanelAppliedRegex.Size = new System.Drawing.Size(229, 184);
-            this.CustomPanelAppliedRegex.TabIndex = 1;
+            this.CustomTabControlAppliedRules.BorderColor = System.Drawing.Color.Blue;
+            this.CustomTabControlAppliedRules.Controls.Add(this.TabPageAppliedN);
+            this.CustomTabControlAppliedRules.Controls.Add(this.TabPageAppliedCS);
+            this.CustomTabControlAppliedRules.Controls.Add(this.TabPageAppliedR);
+            this.CustomTabControlAppliedRules.HideTabHeader = false;
+            this.CustomTabControlAppliedRules.Location = new System.Drawing.Point(950, 19);
+            this.CustomTabControlAppliedRules.Multiline = true;
+            this.CustomTabControlAppliedRules.Name = "CustomTabControlAppliedRules";
+            this.CustomTabControlAppliedRules.SelectedIndex = 0;
+            this.CustomTabControlAppliedRules.Size = new System.Drawing.Size(229, 184);
+            this.CustomTabControlAppliedRules.TabIndex = 1;
+            this.CustomTabControlAppliedRules.Tag = "Normal";
             // 
-            // LabelAppliedRegex
+            // TabPageAppliedN
             // 
-            this.LabelAppliedRegex.BackColor = System.Drawing.Color.Firebrick;
-            this.LabelAppliedRegex.Dock = System.Windows.Forms.DockStyle.Top;
-            this.LabelAppliedRegex.Location = new System.Drawing.Point(0, 0);
-            this.LabelAppliedRegex.Name = "LabelAppliedRegex";
-            this.LabelAppliedRegex.Size = new System.Drawing.Size(229, 23);
-            this.LabelAppliedRegex.TabIndex = 1;
-            this.LabelAppliedRegex.Text = "Applied Regular Expressions";
-            this.LabelAppliedRegex.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.TabPageAppliedN.BackColor = System.Drawing.Color.Transparent;
+            this.TabPageAppliedN.Location = new System.Drawing.Point(4, 25);
+            this.TabPageAppliedN.Name = "TabPageAppliedN";
+            this.TabPageAppliedN.Padding = new System.Windows.Forms.Padding(3);
+            this.TabPageAppliedN.Size = new System.Drawing.Size(221, 155);
+            this.TabPageAppliedN.TabIndex = 0;
+            this.TabPageAppliedN.Tag = "Normal";
+            this.TabPageAppliedN.Text = "Normal";
+            // 
+            // TabPageAppliedCS
+            // 
+            this.TabPageAppliedCS.BackColor = System.Drawing.Color.Transparent;
+            this.TabPageAppliedCS.Location = new System.Drawing.Point(4, 46);
+            this.TabPageAppliedCS.Name = "TabPageAppliedCS";
+            this.TabPageAppliedCS.Padding = new System.Windows.Forms.Padding(3);
+            this.TabPageAppliedCS.Size = new System.Drawing.Size(221, 134);
+            this.TabPageAppliedCS.TabIndex = 1;
+            this.TabPageAppliedCS.Tag = "Case Sensitive";
+            this.TabPageAppliedCS.Text = "Case Sensitive";
+            // 
+            // TabPageAppliedR
+            // 
+            this.TabPageAppliedR.BackColor = System.Drawing.Color.Transparent;
+            this.TabPageAppliedR.Location = new System.Drawing.Point(4, 25);
+            this.TabPageAppliedR.Name = "TabPageAppliedR";
+            this.TabPageAppliedR.Padding = new System.Windows.Forms.Padding(3);
+            this.TabPageAppliedR.Size = new System.Drawing.Size(221, 155);
+            this.TabPageAppliedR.TabIndex = 2;
+            this.TabPageAppliedR.Tag = "Regex";
+            this.TabPageAppliedR.Text = "Regex";
             // 
             // CustomDataGridViewPreview
             // 
@@ -763,7 +790,7 @@
             this.CustomGroupBoxRules.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.CustomDataGridViewRules)).EndInit();
             this.CustomGroupBoxPreview.ResumeLayout(false);
-            this.CustomPanelAppliedRegex.ResumeLayout(false);
+            this.CustomTabControlAppliedRules.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.CustomDataGridViewPreview)).EndInit();
             this.ResumeLayout(false);
 
@@ -805,7 +832,9 @@
         private DataGridViewTextBoxColumn ColumnLine;
         private DataGridViewTextBoxColumn ColumnBefore;
         private DataGridViewTextBoxColumn ColumnAfter;
-        private CustomControls.CustomPanel CustomPanelAppliedRegex;
-        private Label LabelAppliedRegex;
+        private CustomControls.CustomTabControl CustomTabControlAppliedRules;
+        private TabPage TabPageAppliedN;
+        private TabPage TabPageAppliedCS;
+        private TabPage TabPageAppliedR;
     }
 }

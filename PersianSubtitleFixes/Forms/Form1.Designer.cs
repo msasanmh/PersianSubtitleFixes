@@ -132,6 +132,7 @@
             this.CustomToolStripComboBoxEncoding = new CustomControls.CustomToolStripComboBox();
             this.ToolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
             this.ToolStripButtonEdit = new System.Windows.Forms.ToolStripButton();
+            this.ToolStripButtonEditAdmin = new System.Windows.Forms.ToolStripButton();
             this.ToolStripButtonSettings = new System.Windows.Forms.ToolStripButton();
             this.ToolStripButtonAbout = new System.Windows.Forms.ToolStripButton();
             this.ToolStripButtonExit = new System.Windows.Forms.ToolStripButton();
@@ -459,6 +460,7 @@
             this.CustomLabelSameTimeDifference.Border = false;
             this.CustomLabelSameTimeDifference.BorderColor = System.Drawing.Color.Blue;
             this.CustomLabelSameTimeDifference.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.CustomLabelSameTimeDifference.ForeColor = System.Drawing.Color.White;
             this.CustomLabelSameTimeDifference.Location = new System.Drawing.Point(20, 217);
             this.CustomLabelSameTimeDifference.Name = "CustomLabelSameTimeDifference";
             this.CustomLabelSameTimeDifference.RoundedCorners = 0;
@@ -488,6 +490,7 @@
             this.CustomLabelMinGap.Border = false;
             this.CustomLabelMinGap.BorderColor = System.Drawing.Color.Blue;
             this.CustomLabelMinGap.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.CustomLabelMinGap.ForeColor = System.Drawing.Color.White;
             this.CustomLabelMinGap.Location = new System.Drawing.Point(2, 170);
             this.CustomLabelMinGap.Name = "CustomLabelMinGap";
             this.CustomLabelMinGap.RoundedCorners = 0;
@@ -502,6 +505,7 @@
             this.CustomLabelMaxDurationLimit.Border = false;
             this.CustomLabelMaxDurationLimit.BorderColor = System.Drawing.Color.Blue;
             this.CustomLabelMaxDurationLimit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.CustomLabelMaxDurationLimit.ForeColor = System.Drawing.Color.White;
             this.CustomLabelMaxDurationLimit.Location = new System.Drawing.Point(2, 140);
             this.CustomLabelMaxDurationLimit.Name = "CustomLabelMaxDurationLimit";
             this.CustomLabelMaxDurationLimit.RoundedCorners = 0;
@@ -516,6 +520,7 @@
             this.CustomLabelMinDurationlimit.Border = false;
             this.CustomLabelMinDurationlimit.BorderColor = System.Drawing.Color.Blue;
             this.CustomLabelMinDurationlimit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.CustomLabelMinDurationlimit.ForeColor = System.Drawing.Color.White;
             this.CustomLabelMinDurationlimit.Location = new System.Drawing.Point(2, 110);
             this.CustomLabelMinDurationlimit.Name = "CustomLabelMinDurationlimit";
             this.CustomLabelMinDurationlimit.RoundedCorners = 0;
@@ -903,6 +908,7 @@
             this.CustomLabelToFrameRate.Border = false;
             this.CustomLabelToFrameRate.BorderColor = System.Drawing.Color.Blue;
             this.CustomLabelToFrameRate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.CustomLabelToFrameRate.ForeColor = System.Drawing.Color.White;
             this.CustomLabelToFrameRate.Location = new System.Drawing.Point(6, 48);
             this.CustomLabelToFrameRate.Name = "CustomLabelToFrameRate";
             this.CustomLabelToFrameRate.RoundedCorners = 0;
@@ -917,6 +923,7 @@
             this.CustomLabelFromFrameRate.Border = false;
             this.CustomLabelFromFrameRate.BorderColor = System.Drawing.Color.Blue;
             this.CustomLabelFromFrameRate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.CustomLabelFromFrameRate.ForeColor = System.Drawing.Color.White;
             this.CustomLabelFromFrameRate.Location = new System.Drawing.Point(6, 23);
             this.CustomLabelFromFrameRate.Name = "CustomLabelFromFrameRate";
             this.CustomLabelFromFrameRate.RoundedCorners = 0;
@@ -993,6 +1000,7 @@
             this.CustomLabelAdjustAllTimes.Border = false;
             this.CustomLabelAdjustAllTimes.BorderColor = System.Drawing.Color.Blue;
             this.CustomLabelAdjustAllTimes.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.CustomLabelAdjustAllTimes.ForeColor = System.Drawing.Color.White;
             this.CustomLabelAdjustAllTimes.Location = new System.Drawing.Point(4, 16);
             this.CustomLabelAdjustAllTimes.Name = "CustomLabelAdjustAllTimes";
             this.CustomLabelAdjustAllTimes.RoundedCorners = 0;
@@ -1087,6 +1095,7 @@
             this.CustomLabelSameTextDifference.Border = false;
             this.CustomLabelSameTextDifference.BorderColor = System.Drawing.Color.Blue;
             this.CustomLabelSameTextDifference.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.CustomLabelSameTextDifference.ForeColor = System.Drawing.Color.White;
             this.CustomLabelSameTextDifference.Location = new System.Drawing.Point(20, 62);
             this.CustomLabelSameTextDifference.Name = "CustomLabelSameTextDifference";
             this.CustomLabelSameTextDifference.RoundedCorners = 0;
@@ -1443,6 +1452,7 @@
             this.CustomToolStripComboBoxEncoding,
             this.ToolStripSeparator9,
             this.ToolStripButtonEdit,
+            this.ToolStripButtonEditAdmin,
             this.ToolStripButtonSettings,
             this.ToolStripButtonAbout,
             this.ToolStripButtonExit});
@@ -1591,7 +1601,6 @@
             // ToolStripButtonEdit
             // 
             this.ToolStripButtonEdit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.ToolStripButtonEdit.Enabled = false;
             this.ToolStripButtonEdit.Image = global::PersianSubtitleFixes.Properties.Resources.Edit_Black;
             this.ToolStripButtonEdit.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.ToolStripButtonEdit.ImageTransparentColor = System.Drawing.Color.Transparent;
@@ -1599,6 +1608,18 @@
             this.ToolStripButtonEdit.Size = new System.Drawing.Size(36, 37);
             this.ToolStripButtonEdit.Text = "Edit";
             this.ToolStripButtonEdit.Click += new System.EventHandler(this.ToolStripButtonEdit_Click);
+            // 
+            // ToolStripButtonEditAdmin
+            // 
+            this.ToolStripButtonEditAdmin.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.ToolStripButtonEditAdmin.Enabled = false;
+            this.ToolStripButtonEditAdmin.Image = global::PersianSubtitleFixes.Properties.Resources.Edit_Admin_Black;
+            this.ToolStripButtonEditAdmin.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.ToolStripButtonEditAdmin.ImageTransparentColor = System.Drawing.Color.Transparent;
+            this.ToolStripButtonEditAdmin.Name = "ToolStripButtonEditAdmin";
+            this.ToolStripButtonEditAdmin.Size = new System.Drawing.Size(36, 37);
+            this.ToolStripButtonEditAdmin.Text = "Edit Admin";
+            this.ToolStripButtonEditAdmin.Click += new System.EventHandler(this.ToolStripButtonEditAdmin_Click);
             // 
             // ToolStripButtonSettings
             // 
@@ -1750,6 +1771,7 @@
             this.Controls.Add(this.CustomButtonInvertCheck);
             this.Controls.Add(this.CustomMenuStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.KeyPreview = true;
             this.Name = "FormMain";
             this.Text = "FormMain";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form_Closing);
@@ -1907,5 +1929,6 @@
         private ToolStripMenuItem RemoveUnicodeControlCharsToolStripMenuItem;
         private ToolStripMenuItem ViewToolStripMenuItem;
         internal ToolStripMenuItem ShowPopupGuideToolStripMenuItem;
+        private ToolStripButton ToolStripButtonEditAdmin;
     }
 }

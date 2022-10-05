@@ -13,7 +13,7 @@
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <ApplicationIcon>PersianSubtitleFixesIcon.ico</ApplicationIcon>
     <NoWin32Manifest>true</NoWin32Manifest>
-    <Version>$(VersionPrefix)1.0.3</Version>
+    <Version>$(VersionPrefix)1.0.4</Version>
   </PropertyGroup>
 
   <ItemGroup>

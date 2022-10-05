@@ -83,6 +83,26 @@ namespace PersianSubtitleFixes.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap Edit_Admin_Black {
+            get {
+                object obj = ResourceManager.GetObject("Edit_Admin_Black", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap Edit_Admin_Blue {
+            get {
+                object obj = ResourceManager.GetObject("Edit_Admin_Blue", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap Edit_Black {
             get {
                 object obj = ResourceManager.GetObject("Edit_Black", resourceCulture);

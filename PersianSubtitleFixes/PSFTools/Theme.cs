@@ -85,8 +85,10 @@ namespace PSFTools
                         b.Image = PersianSubtitleFixes.Properties.Resources.Undo_Blue;
                     else if (b.Name.Contains("Redo"))
                         b.Image = PersianSubtitleFixes.Properties.Resources.Redo_Blue;
-                    else if (b.Name.Contains("Edit"))
+                    else if (b.Name.Equals("ToolStripButtonEdit"))
                         b.Image = PersianSubtitleFixes.Properties.Resources.Edit_Blue;
+                    else if (b.Name.Equals("ToolStripButtonEditAdmin"))
+                        b.Image = PersianSubtitleFixes.Properties.Resources.Edit_Admin_Blue;
                     else if (b.Name.Contains("Settings"))
                         b.Image = PersianSubtitleFixes.Properties.Resources.Settings_Blue;
                     else if (b.Name.Contains("About"))

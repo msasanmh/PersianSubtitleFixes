@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v6.0": {
-      "PersianSubtitleFixes/1.0.3": {
+      "PersianSubtitleFixes/1.0.4": {
         "dependencies": {
           "System.Text.Encoding.CodePages": "6.0.0",
           "Crc32.NET": "1.0.0.0",
@@ -50,7 +50,7 @@
     }
   },
   "libraries": {
-    "PersianSubtitleFixes/1.0.3": {
+    "PersianSubtitleFixes/1.0.4": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

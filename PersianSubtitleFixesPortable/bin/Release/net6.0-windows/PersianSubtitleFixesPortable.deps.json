@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v6.0": {
-      "PersianSubtitleFixesPortable/1.0.3": {
+      "PersianSubtitleFixesPortable/1.0.4": {
         "runtime": {
           "PersianSubtitleFixesPortable.dll": {}
         }
@@ -14,7 +14,7 @@
     }
   },
   "libraries": {
-    "PersianSubtitleFixesPortable/1.0.3": {
+    "PersianSubtitleFixesPortable/1.0.4": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

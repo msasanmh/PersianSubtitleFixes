@@ -11,9 +11,11 @@
     <Space_x0020_to_x0020_Invisible_x0020_Space>True</Space_x0020_to_x0020_Invisible_x0020_Space>
     <OCR>True</OCR>
     <Fix_x0020_Comments>True</Fix_x0020_Comments>
-    <Remove_x0020_Leading_x0020_Dots>True</Remove_x0020_Leading_x0020_Dots>
-    <Remove_x0020_Dot_x0020_from_x0020_the_x0020_End_x0020_of_x0020_Line>True</Remove_x0020_Dot_x0020_from_x0020_the_x0020_End_x0020_of_x0020_Line>
+    <Remove_x0020_Leading_x0020_Dots>False</Remove_x0020_Leading_x0020_Dots>
+    <Remove_x0020_Dot_x0020_from_x0020_the_x0020_End_x0020_of_x0020_Line>False</Remove_x0020_Dot_x0020_from_x0020_the_x0020_End_x0020_of_x0020_Line>
     <Guide>True</Guide>
+    <Test_x0020_User>True</Test_x0020_User>
+    <nbv>False</nbv>
   </CheckBoxes>
   <Timing>
     <MinimumDurationLimit>1000</MinimumDurationLimit>
@@ -38,7 +40,7 @@
   </Others>
   <General>
     <DefaultEncodingDisplayName>UTF-8</DefaultEncodingDisplayName>
-    <Theme>Light</Theme>
-    <ShowPopupGuide>False</ShowPopupGuide>
+    <Theme>Dark</Theme>
+    <ShowPopupGuide>True</ShowPopupGuide>
   </General>
 </Settings>

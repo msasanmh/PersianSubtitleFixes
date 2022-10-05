@@ -21,7 +21,9 @@ namespace PSFTools
     public static class PSF
     {
         public static readonly string ResourcePath = "PersianSubtitleFixes.ReplaceList.multiple_replace.xml";
+        public static readonly string ReplaceListDirPath = Path.Combine(Tools.Info.CurrentPath, "ReplaceList");
         public static readonly string ReplaceListPath = Path.Combine(Tools.Info.CurrentPath, "ReplaceList", "multiple_replace.xml");
+        public static readonly string UserReplaceListPath = Path.Combine(Tools.Info.CurrentPath, "ReplaceList", "User_multiple_replace.xml");
         public static readonly string LineSeparator = "<br />";
         public static readonly string Group_FixUnicodeControlChar = "Fix Unicode Control Char";
         public static readonly string Group_ChangeArabicCharsToPersian = "Change Arabic Chars to Persian";
@@ -236,13 +238,16 @@ namespace PSFTools
             });
         }
         //=======================================================================================
-        public static List<string>? ListGroupNames()
+        public static List<string>? ListGroupNames(string replaceListPath)
         {
             //string fileContent = Tools.Resource.GetResourceTextFile(ResourcePath);
             //string fileContent = File.ReadAllText(ReplaceListPath);
+
+            if (!File.Exists(replaceListPath)) return null;
+
             List<string> listGN = new();
             XDocument replaceList = new();
-            replaceList = XDocument.Load(ReplaceListPath, LoadOptions.None);
+            replaceList = XDocument.Load(replaceListPath, LoadOptions.None);
             var nodesGroups = replaceList.Root.Elements().Elements();
 
             if (!nodesGroups.Any())

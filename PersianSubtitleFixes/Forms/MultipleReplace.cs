@@ -25,9 +25,12 @@ namespace PersianSubtitleFixes
         private static string? CurrentTheme;
         private static XDocument? ReplaceList;
         private static readonly List<string> ListGroupNames = new();
+        private static string GetReplaceListPath = PSF.UserReplaceListPath; // Default Path
 
-        // Save Paragraph Number and Applied Regexes
-        private static Dictionary<int, List<Tuple<string, int>>> AppliedRules = new();
+        // Save Paragraph Number and Applied Rules
+        private static Dictionary<int, List<Tuple<string, int>>> AppliedRulesNormal = new();
+        private static Dictionary<int, List<Tuple<string, int>>> AppliedRulesCaseSensitive = new();
+        private static Dictionary<int, List<Tuple<string, int>>> AppliedRulesRegex = new();
 
         // Context Menu Group
         private static CustomContextMenuStrip MG = new();
@@ -70,7 +73,14 @@ namespace PersianSubtitleFixes
             return replaceWith;
         }
 
-        public MultipleReplace()
+        public struct SearchType
+        {
+            public const string Normal = "Normal";
+            public const string CaseSensitive = "CaseSensitive";
+            public const string RegularExpression = "RegularExpression";
+        }
+
+        public MultipleReplace(string replaceListPath)
         {
             InitializeComponent();
             Size = new(1200, 700);
@@ -78,47 +88,46 @@ namespace PersianSubtitleFixes
 
             CurrentTheme = Theme.GetTheme();
 
-            Text = "Multiple Replace Edit";
+            GetReplaceListPath = replaceListPath;
 
             if (FormMain.SubCurrent != null)
                 subPreview = new(FormMain.SubCurrent);
-
-            // Initialize Menu
-            CreateMenuGroup();
-            CreateMenuRule();
 
             // Load Theme
             Theme.LoadTheme(this, Controls);
 
             // Load XML Settings
-            LoadXmlSettings();
+            LoadXmlRL(GetReplaceListPath);
 
             ReadGroups(null, false);
         }
 
-        public static void LoadXmlSettings()
+        public static void LoadXmlRL(string replaceLP)
         {
-            if (!File.Exists(PSF.ReplaceListPath))
+            if (!Directory.Exists(PSF.ReplaceListDirPath))
+                Directory.CreateDirectory(PSF.ReplaceListDirPath);
+
+            if (!File.Exists(replaceLP))
             {
-                File.Create(PSF.ReplaceListPath).Dispose();
-                ReplaceList = CreateXmlSettings();
-                ReplaceList.Save(PSF.ReplaceListPath, SaveOptions.None);
+                File.Create(replaceLP).Dispose();
+                ReplaceList = CreateXmlRL();
+                ReplaceList.Save(replaceLP, SaveOptions.None);
             }
-            else if (string.IsNullOrWhiteSpace(File.ReadAllText(PSF.ReplaceListPath)))
+            else if (string.IsNullOrWhiteSpace(File.ReadAllText(replaceLP)))
             {
-                ReplaceList = CreateXmlSettings();
-                ReplaceList.Save(PSF.ReplaceListPath, SaveOptions.None);
+                ReplaceList = CreateXmlRL();
+                ReplaceList.Save(replaceLP, SaveOptions.None);
             }
-            else if (!Tools.Xml.IsValidXML(File.ReadAllText(PSF.ReplaceListPath)))
+            else if (!Tools.Xml.IsValidXML(File.ReadAllText(replaceLP)))
             {
-                CustomMessageBox.Show("Settings file is not valid. Returned to default.", "Not Valid", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                ReplaceList = CreateXmlSettings();
-                ReplaceList.Save(PSF.ReplaceListPath, SaveOptions.None);
+                CustomMessageBox.Show("XML file is not valid. Returned to default.", "Not Valid", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ReplaceList = CreateXmlRL();
+                ReplaceList.Save(replaceLP, SaveOptions.None);
             }
-            ReplaceList = XDocument.Load(PSF.ReplaceListPath, LoadOptions.None);
+            ReplaceList = XDocument.Load(replaceLP, LoadOptions.None);
         }
 
-        private static XDocument CreateXmlSettings()
+        private static XDocument CreateXmlRL()
         {
             XDocument doc = new();
             XElement group = new("Settings");
@@ -319,11 +328,11 @@ namespace PersianSubtitleFixes
                         row.Cells[1].Value = node.Element("FindWhat").Value;
                         row.Cells[2].Value = node.Element("ReplaceWith").Value;
                         string searchType;
-                        if (node.Element("SearchType").Value == "Normal")
+                        if (node.Element("SearchType").Value == SearchType.Normal)
                             searchType = "Normal";
-                        else if (node.Element("SearchType").Value == "CaseSensitive")
+                        else if (node.Element("SearchType").Value == SearchType.CaseSensitive)
                             searchType = "Case Sensitive";
-                        else if (node.Element("SearchType").Value == "RegularExpression")
+                        else if (node.Element("SearchType").Value == SearchType.RegularExpression)
                             searchType = "Regular Expression";
                         else
                             searchType = node.Element("SearchType").Value;
@@ -516,9 +525,9 @@ namespace PersianSubtitleFixes
         {
             string searchTypeString = CustomComboBoxSearchType.SelectedItem.ToString().IsNotNull();
             if (CustomComboBoxSearchType.SelectedItem.ToString().IsNotNull() == "Case Sensitive")
-                searchTypeString = "CaseSensitive";
+                searchTypeString = SearchType.CaseSensitive;
             else if (CustomComboBoxSearchType.SelectedItem.ToString().IsNotNull() == "Regular Expression")
-                searchTypeString = "RegularExpression";
+                searchTypeString = SearchType.RegularExpression;
 
             XElement rule = new("MultipleSearchAndReplaceItem");
 
@@ -598,7 +607,7 @@ namespace PersianSubtitleFixes
                         nodeG.Element("Enabled").Value = dgvG.Rows[a].Cells[0].Value.ToString().IsNotNull();
 
                         // Save xDocument to File
-                        ReplaceList.Save(PSF.ReplaceListPath, SaveOptions.None);
+                        ReplaceList.Save(GetReplaceListPath, SaveOptions.None);
                     }
                 }
             }
@@ -607,6 +616,7 @@ namespace PersianSubtitleFixes
         private void CustomDataGridViewGroups_KeyDown(object sender, KeyEventArgs e)
         {
             // Assign Menu Shortcuts to KeyDown (Use Shortcuts When Menu is Not Displayed)
+            CreateMenuGroup();
             void checkShortcut(ToolStripMenuItem item)
             {
                 if (item.ShortcutKeys == e.KeyData)
@@ -820,7 +830,7 @@ namespace PersianSubtitleFixes
             ReadGroups(newGroupName, false);
 
             // Save xDocument to File
-            ReplaceList.Save(PSF.ReplaceListPath, SaveOptions.None);
+            ReplaceList.Save(GetReplaceListPath, SaveOptions.None);
 
             Debug.WriteLine("New Group Created: " + newGroupName);
         }
@@ -865,7 +875,7 @@ namespace PersianSubtitleFixes
             ReadGroups(groupNameNew, false);
 
             // Save xDocument to File
-            ReplaceList.Save(PSF.ReplaceListPath, SaveOptions.None);
+            ReplaceList.Save(GetReplaceListPath, SaveOptions.None);
 
             Debug.WriteLine("Group Renamed From \"" + groupNameOld + "\" To \"" + groupNameNew + "\"");
         }
@@ -883,7 +893,7 @@ namespace PersianSubtitleFixes
             RemoveGroup(groupName);
 
             // Save xDocument to File
-            ReplaceList.Save(PSF.ReplaceListPath, SaveOptions.None);
+            ReplaceList.Save(GetReplaceListPath, SaveOptions.None);
 
             Debug.WriteLine("Group Removed: " + groupName);
         }
@@ -945,7 +955,7 @@ namespace PersianSubtitleFixes
             ReadGroups(groupName, true);
 
             // Save xDocument to File
-            ReplaceList.Save(PSF.ReplaceListPath, SaveOptions.None);
+            ReplaceList.Save(GetReplaceListPath, SaveOptions.None);
 
             Debug.WriteLine("Group Moved Up: " + groupName);
         }
@@ -1007,7 +1017,7 @@ namespace PersianSubtitleFixes
             ReadGroups(groupName, true);
 
             // Save xDocument to File
-            ReplaceList.Save(PSF.ReplaceListPath, SaveOptions.None);
+            ReplaceList.Save(GetReplaceListPath, SaveOptions.None);
 
             Debug.WriteLine("Group Moved Down: " + groupName);
         }
@@ -1069,7 +1079,7 @@ namespace PersianSubtitleFixes
             ReadGroups(groupName, false);
 
             // Save xDocument to File
-            ReplaceList.Save(PSF.ReplaceListPath, SaveOptions.None);
+            ReplaceList.Save(GetReplaceListPath, SaveOptions.None);
 
             Debug.WriteLine("Group Moved To Top: " + groupName);
         }
@@ -1131,7 +1141,7 @@ namespace PersianSubtitleFixes
             ReadGroups(groupName, false);
 
             // Save xDocument to File
-            ReplaceList.Save(PSF.ReplaceListPath, SaveOptions.None);
+            ReplaceList.Save(GetReplaceListPath, SaveOptions.None);
 
             Debug.WriteLine("Group Moved To Buttom: " + groupName);
         }
@@ -1148,8 +1158,22 @@ namespace PersianSubtitleFixes
             {
                 string filePath = ofd.FileName;
 
+                if (!Tools.Xml.IsValidXML(File.ReadAllText(filePath)))
+                {
+                    CustomMessageBox.Show("XML file is not valid.", "Not Valid", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
                 XDocument importedReplaceList = new();
                 importedReplaceList = XDocument.Load(filePath);
+
+                var nodesGroups = importedReplaceList.Root.Elements().Elements();
+
+                if (!nodesGroups.Any())
+                {
+                    CustomMessageBox.Show("XML file has no groups.", "No Groups", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
 
                 Form Import = new()
                 {
@@ -1195,11 +1219,6 @@ namespace PersianSubtitleFixes
                     Height = Import.ClientRectangle.Height - textHeight - buttonCancel.Height - 20
                 };
                 Import.Controls.Add(panel);
-
-                var nodesGroups = importedReplaceList.Root.Elements().Elements();
-
-                if (!nodesGroups.Any())
-                    return;
 
                 for (int a = 0; a < nodesGroups.Count(); a++)
                 {
@@ -1273,7 +1292,7 @@ namespace PersianSubtitleFixes
                     ReadGroups(firstGroup, false);
 
                     // Save xDocument to File
-                    ReplaceList.Save(PSF.ReplaceListPath, SaveOptions.None);
+                    ReplaceList.Save(GetReplaceListPath, SaveOptions.None);
                 }
 
                 // Context Menu Import (Selection)
@@ -1425,7 +1444,7 @@ namespace PersianSubtitleFixes
                     }
                 }
 
-                XDocument doc = CreateXmlSettings();
+                XDocument doc = CreateXmlRL();
                 var insert = doc.Root.Element("MultipleSearchAndReplaceList");
 
                 ints.Sort();
@@ -1591,7 +1610,7 @@ namespace PersianSubtitleFixes
                             nodeItem.Element("Enabled").Value = dgvR.Rows[b].Cells[0].Value.ToString().IsNotNull();
 
                             // Save xDocument to File
-                            ReplaceList.Save(PSF.ReplaceListPath, SaveOptions.None);
+                            ReplaceList.Save(GetReplaceListPath, SaveOptions.None);
                         }
                     }
                 }
@@ -1601,6 +1620,7 @@ namespace PersianSubtitleFixes
         private void CustomDataGridViewRules_KeyDown(object sender, KeyEventArgs e)
         {
             // Assign Menu Shortcuts to KeyDown (Use Shortcuts When Menu is Not Displayed)
+            CreateMenuRule();
             void checkShortcut(ToolStripMenuItem item)
             {
                 if (item.ShortcutKeys == e.KeyData)
@@ -1940,7 +1960,7 @@ namespace PersianSubtitleFixes
             dgvR.ClearSelection();
 
             // Save xDocument to File
-            ReplaceList.Save(PSF.ReplaceListPath, SaveOptions.None);
+            ReplaceList.Save(GetReplaceListPath, SaveOptions.None);
         }
 
         private void MenuRuleRemoveAll_Click(object? sender, EventArgs e)
@@ -1974,7 +1994,7 @@ namespace PersianSubtitleFixes
             ReadRules(groupName);
 
             // Save xDocument to File
-            ReplaceList.Save(PSF.ReplaceListPath, SaveOptions.None);
+            ReplaceList.Save(GetReplaceListPath, SaveOptions.None);
 
             Debug.WriteLine("All Rules Removed From " + groupName);
         }
@@ -2060,7 +2080,7 @@ namespace PersianSubtitleFixes
             dgvR.ClearSelection();
 
             // Save xDocument to File
-            ReplaceList.Save(PSF.ReplaceListPath, SaveOptions.None);
+            ReplaceList.Save(GetReplaceListPath, SaveOptions.None);
 
             Debug.WriteLine("All Selected Rules Moved to " + groupToSend);
         }
@@ -2120,7 +2140,7 @@ namespace PersianSubtitleFixes
             ShowRow(dgvR, selectRules, firstVisible);
 
             // Save xDocument to File
-            ReplaceList.Save(PSF.ReplaceListPath, SaveOptions.None);
+            ReplaceList.Save(GetReplaceListPath, SaveOptions.None);
 
             Debug.WriteLine("Selected Rules Moved up");
         }
@@ -2185,7 +2205,7 @@ namespace PersianSubtitleFixes
             ShowRow(dgvR, selectRules, firstVisible);
 
             // Save xDocument to File
-            ReplaceList.Save(PSF.ReplaceListPath, SaveOptions.None);
+            ReplaceList.Save(GetReplaceListPath, SaveOptions.None);
 
             Debug.WriteLine("All Selected Rules Moved Down");
         }
@@ -2246,7 +2266,7 @@ namespace PersianSubtitleFixes
             ShowRow(dgvR, selectRules, firstVisible);
 
             // Save xDocument to File
-            ReplaceList.Save(PSF.ReplaceListPath, SaveOptions.None);
+            ReplaceList.Save(GetReplaceListPath, SaveOptions.None);
 
             Debug.WriteLine("All Selected Rules Moved to Top");
         }
@@ -2307,7 +2327,7 @@ namespace PersianSubtitleFixes
             ShowRow(dgvR, selectRules, firstVisible);
 
             // Save xDocument to File
-            ReplaceList.Save(PSF.ReplaceListPath, SaveOptions.None);
+            ReplaceList.Save(GetReplaceListPath, SaveOptions.None);
 
             Debug.WriteLine("All Selected Rules Moved to Bottom");
         }
@@ -2335,11 +2355,20 @@ namespace PersianSubtitleFixes
 
                 string filePath = ofd.FileName;
 
+                if (!Tools.Xml.IsValidXML(File.ReadAllText(filePath)))
+                {
+                    CustomMessageBox.Show("XML file is not valid.", "Not Valid", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
                 XDocument importedReplaceList = XDocument.Load(filePath);
                 var nodesGroups = importedReplaceList.Root.Elements().Elements();
-                
+
                 if (!nodesGroups.Any())
+                {
+                    CustomMessageBox.Show("XML file has no groups.", "No Groups", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
+                }
 
                 for (int a = 0; a < nodesGroups.Count(); a++)
                 {
@@ -2347,7 +2376,10 @@ namespace PersianSubtitleFixes
                     var rules = nodeG.Elements("MultipleSearchAndReplaceItem");
                     
                     if (!rules.Any())
+                    {
+                        CustomMessageBox.Show("Group has no rules.", "No Rules", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
+                    }
 
                     for (int b = 0; b < rules.Count(); b++)
                     {
@@ -2363,7 +2395,7 @@ namespace PersianSubtitleFixes
                 ShowRow(dgvR, selectRule, selectRule);
 
                 // Save xDocument to File
-                ReplaceList.Save(PSF.ReplaceListPath, SaveOptions.None);
+                ReplaceList.Save(GetReplaceListPath, SaveOptions.None);
             }
         }
 
@@ -2376,7 +2408,7 @@ namespace PersianSubtitleFixes
 
             string groupToExport = dgvG.SelectedRows[0].Cells[1].Value.ToString();
 
-            XDocument doc = CreateXmlSettings();
+            XDocument doc = CreateXmlRL();
             var insert = doc.Root.Element("MultipleSearchAndReplaceList");
 
             insert.Add(GetXmlGroupByName(ReplaceList, groupToExport.IsNotNull()));
@@ -2556,7 +2588,7 @@ namespace PersianSubtitleFixes
                 ShowRow(dgvR, rowToInsert + 1, firstVisible);
 
                 // Save xDocument to File
-                ReplaceList.Save(PSF.ReplaceListPath, SaveOptions.None);
+                ReplaceList.Save(GetReplaceListPath, SaveOptions.None);
             }
 
             void MenuAddToEnd_Click(object? sender, EventArgs e)
@@ -2599,7 +2631,7 @@ namespace PersianSubtitleFixes
                 ShowRow(dgvR, rowToInsert, firstVisible);
 
                 // Save xDocument to File
-                ReplaceList.Save(PSF.ReplaceListPath, SaveOptions.None);
+                ReplaceList.Save(GetReplaceListPath, SaveOptions.None);
             }
         }
 
@@ -2627,13 +2659,13 @@ namespace PersianSubtitleFixes
             string searchTypeString = CustomComboBoxSearchType.SelectedItem.ToString().IsNotNull();
             if (CustomComboBoxSearchType.SelectedItem.ToString().IsNotNull() == "Case Sensitive")
             {
-                searchTypeString = "CaseSensitive";
+                searchTypeString = SearchType.CaseSensitive;
             }
             else if (CustomComboBoxSearchType.SelectedItem.ToString().IsNotNull() == "Regular Expression")
             {
-                searchTypeString = "RegularExpression";
+                searchTypeString = SearchType.RegularExpression;
 
-                // Check If Regex is Valid
+                // Check if Regex is Valid
                 if (Tools.Texts.IsValidRegex(CustomTextBoxFindWhat.Texts) == false)
                 {
                     CustomMessageBox.Show("Regex is not valid.", "Regex");
@@ -2676,7 +2708,7 @@ namespace PersianSubtitleFixes
             ShowRow(dgvR, rowToSelect, firstVisible);
 
             // Save xDocument to File
-            ReplaceList.Save(PSF.ReplaceListPath, SaveOptions.None);
+            ReplaceList.Save(GetReplaceListPath, SaveOptions.None);
         }
 
         //======================================= Preview ======================================
@@ -2757,7 +2789,7 @@ namespace PersianSubtitleFixes
                                 findWhat = FindWhatRule(findWhat);
                                 replaceWith = ReplaceWithRule(replaceWith);
 
-                                if (searchType == "RegularExpression" && !CompiledRegExList.ContainsKey(findWhat))
+                                if (searchType == SearchType.RegularExpression && !CompiledRegExList.ContainsKey(findWhat))
                                 {
                                     CompiledRegExList.Add(findWhat, new Regex(findWhat, RegexOptions.Compiled | RegexOptions.Multiline,
                                         TimeSpan.FromMilliseconds(2000)));
@@ -2773,7 +2805,9 @@ namespace PersianSubtitleFixes
                 List<DataGridViewRow> fixes = new();
                 fixes.Clear();
 
-                AppliedRules.Clear();
+                AppliedRulesNormal.Clear();
+                AppliedRulesCaseSensitive.Clear();
+                AppliedRulesRegex.Clear();
 
                 // Set a timeout interval of 2 seconds.
                 AppDomain domain = AppDomain.CurrentDomain;
@@ -2782,6 +2816,8 @@ namespace PersianSubtitleFixes
                 //Parallel.ForEach(_subtitle.Paragraphs, p =>
                 for (int pn = 0; pn < subPreview.Paragraphs.Count; pn++)
                 {
+                    List<Tuple<string, int>> tempAppliedNormal = new();
+                    List<Tuple<string, int>> tempAppliedCaseSensitive = new();
                     List<Tuple<string, int>> tempAppliedRegex = new();
 
                     Paragraph p = subPreview.Paragraphs[pn];
@@ -2799,12 +2835,16 @@ namespace PersianSubtitleFixes
                         string groupName = list.Item4;
                         int ruleNumber = list.Item5;
 
-                        if (searchType == "CaseSensitive")
+                        if (searchType == SearchType.CaseSensitive)
                         {
                             if (After.Contains(findWhat))
+                            {
+                                if (After.Replace(findWhat, replaceWith) != After)
+                                    tempAppliedCaseSensitive.Add(new Tuple<string, int>(groupName, ruleNumber));
                                 After = After.Replace(findWhat, replaceWith);
+                            }
                         }
-                        else if (searchType == "RegularExpression")
+                        else if (searchType == SearchType.RegularExpression)
                         {
                             Regex regExFindWhat = CompiledRegExList[findWhat];
 
@@ -2826,13 +2866,17 @@ namespace PersianSubtitleFixes
                             }
 
                         }
-                        else if (searchType == "Normal")
+                        else if (searchType == SearchType.Normal)
                         {
+                            if (After.Replace(findWhat, replaceWith, StringComparison.OrdinalIgnoreCase) != After)
+                                tempAppliedNormal.Add(new Tuple<string, int>(groupName, ruleNumber));
                             After = After.Replace(findWhat, replaceWith, StringComparison.OrdinalIgnoreCase);
                         }
                     }
 
-                    AppliedRules.Add(pn, tempAppliedRegex);
+                    AppliedRulesNormal.Add(pn, tempAppliedNormal);
+                    AppliedRulesCaseSensitive.Add(pn, tempAppliedCaseSensitive);
+                    AppliedRulesRegex.Add(pn, tempAppliedRegex);
 
                     After = After.Trim();
                     if (After != Before)
@@ -2868,30 +2912,29 @@ namespace PersianSubtitleFixes
             });
         }
 
-        private void AppliedRegex(int paragraphNumber)
+        private void AppliedRules(int paragraphNumber, Dictionary<int, List<Tuple<string, int>>> appliedRulesDic, TabPage tabPage)
         {
-            for (int i = 0; i < CustomPanelAppliedRegex.Controls.Count; i++)
+            while (tabPage.Controls.Count > 0)
             {
-                Control c1 = CustomPanelAppliedRegex.Controls[i];
-                if (c1 is Panel panel)
+                for (int i = 0; i < tabPage.Controls.Count; i++)
                 {
-                    while (panel.Controls.Count > 1)
-                    {
-                        for (int j = 0; j < panel.Controls.Count; j++)
-                        {
-                            Control c2 = panel.Controls[j];
-                            if (!c2.Name.Equals(LabelAppliedRegex.Name))
-                                panel.Controls.Remove(c2);
-                        }
-                    }
+                    Control subControl = tabPage.Controls[i];
+                    tabPage.Controls.Remove(subControl);
                 }
             }
-
+            
             int countG = 0;
             int countR = 0;
             int topSpace = 30;
+
+            Label label = new();
+            label.Text = "Applied Rules";
+            int x1 = (tabPage.Width - label.GetPreferredSize(Size.Empty).Width) / 2;
+            label.Location = new(x1, 5);
+            label.AutoSize = true;
+            tabPage.Controls.Add(label);
             
-            var appliedRulesList = AppliedRules[paragraphNumber];
+            var appliedRulesList = appliedRulesDic[paragraphNumber];
             for (int a = 0; a < appliedRulesList.Count; a++)
             {
                 var appliedRule = appliedRulesList[a];
@@ -2904,7 +2947,7 @@ namespace PersianSubtitleFixes
                     groupL.Location = new(5, (countG * 20) + (countR * 20) + topSpace);
                     groupL.Text = appliedGroupName;
                     groupL.AutoSize = true;
-                    CustomPanelAppliedRegex.Controls.Add(groupL);
+                    tabPage.Controls.Add(groupL);
                     countG++;
 
                     Label ruleL = new();
@@ -2912,7 +2955,7 @@ namespace PersianSubtitleFixes
                     ruleL.Text = "Rule No. " + (appliedRuleNumber + 1);
                     ruleL.Tag = appliedGroupName + "|" + appliedRuleNumber;
                     ruleL.AutoSize = true;
-                    CustomPanelAppliedRegex.Controls.Add(ruleL);
+                    tabPage.Controls.Add(ruleL);
                     ruleL.Name = "RuleLabel" + a;
                     ruleL.MouseEnter += (s, e) => { ruleL.ForeColor = Color.DodgerBlue; };
                     ruleL.MouseLeave += (s, e) => { ruleL.ForeColor = Colors.ForeColor; };
@@ -2928,7 +2971,7 @@ namespace PersianSubtitleFixes
                         ruleL.Text = "Rule No. " + (appliedRuleNumber + 1);
                         ruleL.Tag = appliedGroupName + "|" + appliedRuleNumber;
                         ruleL.AutoSize = true;
-                        CustomPanelAppliedRegex.Controls.Add(ruleL);
+                        tabPage.Controls.Add(ruleL);
                         ruleL.Name = "RuleLabel" + a;
                         ruleL.Click += RuleL_Click;
                         ruleL.MouseEnter += (s, e) => { ruleL.ForeColor = Color.DodgerBlue; };
@@ -2941,7 +2984,7 @@ namespace PersianSubtitleFixes
                         groupL.Location = new(5, (countG * 20) + (countR * 20) + topSpace);
                         groupL.Text = appliedGroupName;
                         groupL.AutoSize = true;
-                        CustomPanelAppliedRegex.Controls.Add(groupL);
+                        tabPage.Controls.Add(groupL);
                         countG++;
 
                         Label ruleL = new();
@@ -2949,7 +2992,7 @@ namespace PersianSubtitleFixes
                         ruleL.Text = "Rule No. " + (appliedRuleNumber + 1);
                         ruleL.Tag = appliedGroupName + "|" + appliedRuleNumber;
                         ruleL.AutoSize = true;
-                        CustomPanelAppliedRegex.Controls.Add(ruleL);
+                        tabPage.Controls.Add(ruleL);
                         ruleL.Name = "RuleLabel" + a;
                         ruleL.Click += RuleL_Click;
                         ruleL.MouseEnter += (s, e) => { ruleL.ForeColor = Color.DodgerBlue; };
@@ -2961,15 +3004,15 @@ namespace PersianSubtitleFixes
 
             if (appliedRulesList.Count == 0)
             {
-                Label noRegex = new();
-                noRegex.Text = "No Regular Expression Applied.";
-                int x = (CustomPanelAppliedRegex.Width - noRegex.GetPreferredSize(Size.Empty).Width) / 2;
-                noRegex.Location = new(x, topSpace);
-                noRegex.AutoSize = true;
-                CustomPanelAppliedRegex.Controls.Add(noRegex);
+                Label noRules = new();
+                noRules.Text = "No " + tabPage.Text + " Rules Applied.";
+                int x = (tabPage.Width - noRules.GetPreferredSize(Size.Empty).Width) / 2;
+                noRules.Location = new(x, topSpace);
+                noRules.AutoSize = true;
+                tabPage.Controls.Add(noRules);
             }
 
-            CustomPanelAppliedRegex.AutoScroll = true;
+            tabPage.AutoScroll = true;
 
             void RuleL_Click(object? sender, EventArgs e)
             {
@@ -2998,32 +3041,33 @@ namespace PersianSubtitleFixes
             var dgvP = CustomDataGridViewPreview;
 
             if (dgvP.RowCount == 0) return;
-            if (dgvP.SelectedRows.Count == 0) // Clear Applied Regex Panel and Return.
+            if (dgvP.SelectedRows.Count == 0) // Clear Applied Rules and Return.
             {
-                for (int i = 0; i < CustomPanelAppliedRegex.Controls.Count; i++)
+                clearAppliedRules(TabPageAppliedN);
+                clearAppliedRules(TabPageAppliedCS);
+                clearAppliedRules(TabPageAppliedR);
+                return;
+            }
+
+            static void clearAppliedRules(TabPage tabPage)
+            {
+                while (tabPage.Controls.Count > 0)
                 {
-                    Control c1 = CustomPanelAppliedRegex.Controls[i];
-                    if (c1 is Panel panel)
+                    for (int i = 0; i < tabPage.Controls.Count; i++)
                     {
-                        while (panel.Controls.Count > 1)
-                        {
-                            for (int j = 0; j < panel.Controls.Count; j++)
-                            {
-                                Control c2 = panel.Controls[j];
-                                if (!c2.Name.Equals(LabelAppliedRegex.Name))
-                                    panel.Controls.Remove(c2);
-                            }
-                        }
+                        Control subControl = tabPage.Controls[i];
+                        tabPage.Controls.Remove(subControl);
                     }
                 }
-                return;
             }
 
             int currentRow = dgvP.SelectedRows[0].Index;
             int pNumber = int.Parse(dgvP.Rows[currentRow].Cells[0].Value.ToString().IsNotNull());
             pNumber--;
 
-            AppliedRegex(pNumber);
+            AppliedRules(pNumber, AppliedRulesNormal, TabPageAppliedN);
+            AppliedRules(pNumber, AppliedRulesCaseSensitive, TabPageAppliedCS);
+            AppliedRules(pNumber, AppliedRulesRegex, TabPageAppliedR);
         }
 
         private void CustomDataGridViewPreview_MouseDown(object sender, MouseEventArgs e)
@@ -3162,7 +3206,7 @@ namespace PersianSubtitleFixes
             if (e.CloseReason == CloseReason.UserClosing || e.CloseReason == CloseReason.WindowsShutDown)
             {
                 // Save xDocument to File
-                ReplaceList.Save(PSF.ReplaceListPath, SaveOptions.None);
+                ReplaceList.Save(GetReplaceListPath, SaveOptions.None);
             }
         }
 

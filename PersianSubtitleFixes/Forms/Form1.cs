@@ -79,8 +79,9 @@ namespace PersianSubtitleFixes
             // Load Theme
             Theme.LoadTheme(this, Controls);
 
-            // Load XML Settings
-            MultipleReplace.LoadXmlSettings();
+            // Load XML Replace List
+            MultipleReplace.LoadXmlRL(PSF.ReplaceListPath);
+            MultipleReplace.LoadXmlRL(PSF.UserReplaceListPath);
 
             Size = new Size(1150, 632);
             MinimumSize = new Size(1000, 492); // Main form minimum size
@@ -459,7 +460,8 @@ namespace PersianSubtitleFixes
             DataSet ds;
             ds = DataSetSettings;
 
-            List<string> items = PSF.ListGroupNames();
+            // Load Default Replace List
+            List<string> items = PSF.ListGroupNames(PSF.ReplaceListPath);
             int groupsCount = 0;
 
             if (items != null)
@@ -485,7 +487,7 @@ namespace PersianSubtitleFixes
                 box.Checked = state;
                 box.Tag = item;
                 box.Text = item;
-                box.Name = "checkBox" + i.ToString();
+                box.Name = "Default" + i.ToString();
                 box.Click += new EventHandler(CheckboxHandler);
                 box.Location = new Point(10, (i - 1) * 20 + 2);
                 box.Anchor = AnchorStyles.Top; // To Avoid Having Horizontal ScrollBar
@@ -499,13 +501,51 @@ namespace PersianSubtitleFixes
                 Theme.SetColors(box);
                 PSFTools.Guide.Help(box, PictureBoxGuide, ShowPopupGuideToolStripMenuItem);
             }
-            CheckboxHandler(null, null);
+            int y1 = groupsCount * 20;
+
+            // Load User Replace List
+            List<string> userItems = PSF.ListGroupNames(PSF.UserReplaceListPath);
+            int userGroupsCount = 0;
+
+            if (userItems != null)
+                userGroupsCount = userItems.Count;
+
+            int j = 0;
+            for (int n = 0; n < userGroupsCount; n++)
+            {
+                string userItem = userItems[n];
+                j++;
+                CustomCheckBox userBox = new();
+                bool state = true;
+                if (ds.Tables[PSFSettings.SettingsName.CheckBoxes] != null)
+                {
+                    string s = string.Empty;
+                    if (ds.Tables[PSFSettings.SettingsName.CheckBoxes].Columns.Contains(userItem))
+                        s = (string)ds.Tables[PSFSettings.SettingsName.CheckBoxes].Rows[0][userItem];
+                    if (s.IsBool() == true)
+                        state = bool.Parse(s);
+                    else
+                        state = true;
+                }
+                userBox.Checked = state;
+                userBox.Tag = userItem;
+                userBox.Text = userItem;
+                userBox.Name = "User" + j.ToString();
+                userBox.Click += new EventHandler(CheckboxHandler);
+                userBox.Location = new Point(10, ((j - 1) * 20 + 2) + y1);
+                userBox.Anchor = AnchorStyles.Top; // To Avoid Having Horizontal ScrollBar
+                TabPageCommonErrors.Controls.Add(userBox);
+
+                Theme.SetColors(userBox);
+            }
+            int y2 = ((userGroupsCount * 20) + 10) + y1;
 
             // Set Apply, Stop and Cancel Button Location
-            int y = (groupsCount * 20) + 10;
-            CustomButtonApply.Location = new(26, y);
-            CustomButtonStop.Location = new(121, y);
-            CustomButtonCancel.Location = new(74, y + CustomButtonApply.Height + 10);
+            CustomButtonApply.Location = new(26, y2);
+            CustomButtonStop.Location = new(121, y2);
+            CustomButtonCancel.Location = new(74, y2 + CustomButtonApply.Height + 10);
+
+            CheckboxHandler(null, null);
         }
 
         public void FindCheckBoxByGroupName(string groupName, bool state)
@@ -1165,7 +1205,11 @@ namespace PersianSubtitleFixes
             ReplaceExpressionList.Clear();
 
             //var fileContent = Tools.Resource.GetResourceTextFile(PSF.ResourcePath); // Load from Embedded Resource
-            XDocument doc = XDocument.Load(PSF.ReplaceListPath, LoadOptions.PreserveWhitespace);
+            XDocument doc = XDocument.Load(PSF.ReplaceListPath, LoadOptions.None);
+
+            if (File.Exists(PSF.UserReplaceListPath))
+                doc.Root.Element("MultipleSearchAndReplaceList").Add(XDocument.Load(PSF.UserReplaceListPath, LoadOptions.None).Root.Elements().Elements());
+
             var groups = doc.Root.Elements().Elements();
 
             for (int n1 = 0; n1 < TabPageCommonErrors.Controls.Count; n1++)
@@ -1209,6 +1253,9 @@ namespace PersianSubtitleFixes
                     }
                 }
             }
+
+
+
             //========== Replacing List ===========================================
             List<DataGridViewRow> fixes = new();
             fixes.Clear();
@@ -1254,12 +1301,12 @@ namespace PersianSubtitleFixes
                     string replaceWith = list.Item2;
                     string searchType = list.Item3;
 
-                    if (searchType == "CaseSensitive")
+                    if (searchType == MultipleReplace.SearchType.CaseSensitive)
                     {
                         if (After.Contains(findWhat))
                             After = After.Replace(findWhat, replaceWith);
                     }
-                    else if (searchType == "RegularExpression")
+                    else if (searchType == MultipleReplace.SearchType.RegularExpression)
                     {
                         Regex regExFindWhat = CompiledRegExList[findWhat];
 
@@ -1279,7 +1326,7 @@ namespace PersianSubtitleFixes
                         }
 
                     }
-                    else if (searchType == "Normal")
+                    else if (searchType == MultipleReplace.SearchType.Normal)
                     {
                         After = After.Replace(findWhat, replaceWith, StringComparison.OrdinalIgnoreCase);
                     }
@@ -1650,8 +1697,25 @@ namespace PersianSubtitleFixes
         //public static event FormClosedEventHandler? MultipleReplaceFormClosed;
         private void ToolStripButtonEdit_Click(object sender, EventArgs e)
         {
-            Form multipleReplace = new MultipleReplace();
+            Form multipleReplace = new MultipleReplace(PSF.UserReplaceListPath);
             multipleReplace.StartPosition = FormStartPosition.CenterParent;
+            multipleReplace.Text = "Multiple Replace Edit - User";
+            multipleReplace.FormClosed -= MultipleReplace_FormClosed;
+            multipleReplace.FormClosed += MultipleReplace_FormClosed;
+            void MultipleReplace_FormClosed(object? sender, FormClosedEventArgs e)
+            {
+                LoadCheckBoxes();
+                CompiledRegExList.Clear();
+                ChangesNotUnicode();
+            }
+            multipleReplace.ShowDialog(this);
+        }
+
+        private void ToolStripButtonEditAdmin_Click(object? sender, EventArgs? e)
+        {
+            Form multipleReplace = new MultipleReplace(PSF.ReplaceListPath);
+            multipleReplace.StartPosition = FormStartPosition.CenterParent;
+            multipleReplace.Text = "Multiple Replace Edit - Admin";
             multipleReplace.FormClosed -= MultipleReplace_FormClosed;
             multipleReplace.FormClosed += MultipleReplace_FormClosed;
             void MultipleReplace_FormClosed(object? sender, FormClosedEventArgs e)
@@ -1668,7 +1732,6 @@ namespace PersianSubtitleFixes
             Form settings = new Settings();
             settings.StartPosition = FormStartPosition.CenterParent;
             settings.ShowDialog(this);
-
         }
 
         private void ToolStripButtonAbout_Click(object sender, EventArgs e)
@@ -2183,11 +2246,12 @@ namespace PersianSubtitleFixes
 
         private void FormMain_KeyDown(object sender, KeyEventArgs e)
         {
+            // Form.KeyPreview Property must be set to True.
             // Set Shortcuts
-            //if (e.Control && e.KeyCode == Keys.S)
-            //{
-            //    // Do Work
-            //}
+            if (e.Control && e.Shift && e.KeyCode == Keys.M)
+            {
+                ToolStripButtonEditAdmin_Click(null, null);
+            }
         }
 
         

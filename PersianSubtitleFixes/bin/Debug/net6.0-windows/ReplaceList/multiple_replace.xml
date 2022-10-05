@@ -2763,8 +2763,8 @@
       </MultipleSearchAndReplaceItem>
       <MultipleSearchAndReplaceItem>
         <Enabled>True</Enabled>
-        <FindWhat>(\.)([\!\,\?\u060C\u061F]+)</FindWhat>
-        <ReplaceWith>$1</ReplaceWith>
+        <FindWhat>([^\.])(\.)([\!\,\?\u060C\u061F]+)</FindWhat>
+        <ReplaceWith>$1$2</ReplaceWith>
         <SearchType>RegularExpression</SearchType>
         <Description>Dot Fixes</Description>
       </MultipleSearchAndReplaceItem>
